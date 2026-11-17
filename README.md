@@ -4,6 +4,8 @@ A collection of practical standards for **SEO visibility and control on static A
 
 ## Available standards
 
+- [Static Site Setup](site-setup.md) — have an AI agent install lightweight URL change detection, validation, and reporting during initial site setup.
+
 - [Cloudflare Static Sites](cloudflare-static-sites.md) — deploy a new GitHub-based static website using Cloudflare Workers Static Assets, with one canonical HTTPS domain.
 - [301 Redirects for Static Sites](301-redirects.md) — keep page redirects in GitHub with lightweight validation and URL-change safeguards.
 
