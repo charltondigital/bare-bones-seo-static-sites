@@ -3,7 +3,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'scripts/**'\n      - 'platforms/**'\n      - 'templates/**'\n      - '*.md'
+      - 'scripts/**'
+      - 'platforms/**'
+      - 'templates/**'
+      - '*.md'
       - 'tests/**'
       - '.github/workflows/validate-scripts.yml'
   pull_request:
