@@ -25,17 +25,9 @@ Do **not** duplicate these page-level redirects in Cloudflare dashboard rules, A
 - **Avoid unnecessary approvals.** Ordinary content changes that preserve URLs need no additional redirect discussion. A user may review and edit redirects directly without separately approving an agent's instructions.
 - **Keep the agent useful.** Agents may draft redirect changes, validate them, and prepare a reviewable commit or pull request. Do not deploy potentially disruptive redirect changes without appropriate user authorization and repository controls.
 
-## Lightweight validation
+## Validation and reporting
 
-At build or pull-request time, check the following **only when the URL inventory or redirect file changes**, when practical:
-
-1. Detect deleted or renamed previously published paths, and flag those without an approved plan.
-2. Reject duplicate redirect sources, self-redirects, simple loops, and chains (point an old URL directly to its final destination).
-3. Confirm every redirect destination is an intended live, canonical path, not another redirect or a missing page.
-4. Ensure the `_redirects` file is included in the final build output and that existing entries were not silently removed.
-5. After deployment, spot-check affected URLs return 301 with the expected `Location` header.
-
-Prefer a fast, deterministic script over expensive crawling or AI review on every build. Don't require a person to manually inspect a full redirect inventory for each ordinary commit. For strict enforcement, use GitHub branch/ruleset protections with required checks and a human reviewer for protected URL or redirect changes; instructions alone are not technical enforcement.
+Follow the one-time automated URL-integrity setup in [Static Site Setup](site-setup.md). The check should validate the project's `_redirects` file, detect changed or removed URLs, and report only meaningful differences. Reuse the existing build workflow; don't ask the user to configure GitHub Actions manually.
 
 ## Performance and boundaries
 
