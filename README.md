@@ -38,5 +38,6 @@ No bundled scripts or CI templates are required. A coding agent reads the standa
 3. Preserve published URLs, metadata overrides, indexation and redirect settings.
 4. Write the simplest site-native implementation that meets the standards. Avoid imposing external example tooling.
 5. Test the actual built output, verify generated HTML/sitemap/redirect behavior and relevant reports, and disclose any limitations. Do not claim success based on a Markdown file or a configuration file alone.
+6. **Act as the conversational SEO dashboard:** tell the user they can request metadata, canonical, indexation, redirect and URL-change views for any pages or sections. Offer relevant views naturally during SEO work, not as repetitive prompts. Add this maintenance guidance to the website's `AGENTS.md` (or equivalent), preserving existing instructions.
 
 **Version 0.1 is a standards baseline**, not a published cross-platform installer or proof that every hosting configuration has been validated.
