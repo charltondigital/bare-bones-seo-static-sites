@@ -6,11 +6,7 @@
 
 After a static site build, extract distinct outgoing HTTP(S) hyperlinks from generated HTML along with each referring site's page path. Export a CSV with **`external_url`** and **`source_page`** columns, one row per destination/source combination. Do **not** automatically visit, score, or test these external URLs.
 
-Have the AI agent implement extraction with the site's existing build tools; avoid adding an unrelated runtime solely for this report. A conceptual command might be:
-
-```sh
-<site-specific-build-command> && <site-specific-inventory-command>
-```
+Have the AI agent implement extraction with the site's existing build tools, running the inventory step after the build. Do not require a particular runtime or a bundled script.
 
 `seo/reports/external-links.csv` is a **generated output location**, not an authoritative SEO configuration file. Keep it as a **build or CI artifact**, not an automatically committed file. The [GitHub playbook](../playbooks/github.md) explains GitHub Actions artifacts. Add generated reports to `.gitignore` in the website repository if needed. The user may download the CSV, run it through a spider or link-checking tool, or ignore it. Never require the user to fix or inspect these links.
 
