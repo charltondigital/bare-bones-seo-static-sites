@@ -27,7 +27,7 @@ Check the current platform's supported syntax, limits, matching order, and wheth
 
 ## Validation and change reporting
 
-Use the lightweight one-time automation in [Static Site Setup](site-setup.md) to detect unapproved URL changes and differences in `_redirects`. Reuse existing GitHub builds; don't require the user to set up a separate action.
+Use the lightweight one-time automation in [Static Site Setup](site-setup.md) to **report** URL changes and differences in `_redirects`. These checks are **advisory and non-blocking by default**: they do not fail builds, require pull requests, or stop deployments. Reuse existing GitHub builds; don't require the user to set up a separate action.
 
 ## Performance and boundaries
 
