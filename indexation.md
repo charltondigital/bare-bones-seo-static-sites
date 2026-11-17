@@ -31,7 +31,7 @@ During [Static Site Setup](site-setup.md), create `seo/search-exclusions.json` a
 }
 ```
 
-- **`index: false`** emits `noindex` in the rendered HTML (or an appropriate `X-Robots-Tag` for applicable non-HTML resources). **`index: true`** means no `noindex` restriction from this system; it does *not* guarantee search-engine indexing.
+- **`index: false`** emits `noindex` in rendered HTML. For non-HTML resources, use an appropriate `X-Robots-Tag` only if the selected host supports response header configuration; otherwise report that limitation rather than claiming the control works. **`index: true`** means no `noindex` restriction from this system; it does *not* guarantee search-engine indexing.
 - **`sitemap: false`** omits a URL from the generated XML sitemap; it does not remove the page or prevent indexing.
 - An exact page entry overrides its matching section rule; section rules override defaults. For overlapping section patterns, use the most specific match and deterministic tie handling; flag ambiguous conflicts.
 - Exact paths cover individual pages. `/counties/*` covers descendants, **not** the section landing page `/counties/`; add that path separately when desired.
@@ -65,7 +65,7 @@ Do not alter crawler permissions without a specific user request. `robots.txt` i
 
 ## Optional advisory crawler audit
 
-During site setup, the agent may install the reusable [robots.txt audit script](scripts/check-robots.mjs) and [GitHub Actions template](templates/robots-audit.yml), adapting paths to the site's actual build output. The script checks common search and AI-search crawlers and only produces warnings; it does not edit `robots.txt` or fail deployments. Check the generated `robots.txt` rather than assuming a source file is the deployed version. Treat results as heuristics, not proof of Google or LLM crawling behavior.
+During site setup, the agent may install the reusable [robots.txt audit script](scripts/check-robots.mjs) and [GitHub Actions template](templates/robots-audit.yml), adapting its build steps and paths to the site's actual generator and static output. The script checks common search and AI-search crawlers and only produces warnings; it does not edit `robots.txt` or fail deployments. Check the generated `robots.txt` rather than assuming a source file is the deployed version. Treat results as heuristics, not proof of Google or LLM crawling behavior.
 
 ## Decision guidance
 
