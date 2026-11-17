@@ -12,7 +12,7 @@ Use the reusable [external link inventory script](scripts/external-links.mjs), a
 node scripts/external-links.mjs dist https://example.com seo/reports/external-links.csv
 ```
 
-`seo/reports/external-links.csv` is a **generated output location**, not an authoritative SEO configuration file. Under GitHub Actions, upload it as a **run artifact**, not an automatically committed file. Add generated reports to `.gitignore` in the website repository if needed. The user may download the CSV, run it through a spider or link-checking tool, or ignore it. Never require the user to fix or inspect these links.
+`seo/reports/external-links.csv` is a **generated output location**, not an authoritative SEO configuration file. Keep it as a **build or CI artifact**, not an automatically committed file. The [GitHub guide](platforms/github.md) explains GitHub Actions artifacts. Add generated reports to `.gitignore` in the website repository if needed. The user may download the CSV, run it through a spider or link-checking tool, or ignore it. Never require the user to fix or inspect these links.
 
 ## Redirect integrity
 
@@ -20,7 +20,7 @@ Continue using the [301 Redirects standard](301-redirects.md): existing rules ar
 
 Run checks after builds when practical. Report warnings without failing builds, blocking deployment, or automatically rewriting established redirects. For chains, recommend a direct destination rather than silently changing historical rules.
 
-Use the [GitHub Actions example](templates/links-and-redirects.yml) as an **installation template**, not a universal drop-in. GitHub Actions can audit code deployed to **any host**. The AI installer adapts its dependency installation, build command, actual static output directory, site URL, supported redirect format, and existing workflows and should avoid duplicate builds. If the website does not use GitHub Actions, use its existing CI or a local build step. Tests and deployment status checks remain non-blocking.
+The agent adapts existing build or CI checks to the project's dependency installation, build command, static output directory, site URL, and supported redirect format; avoid redundant builds. The [GitHub guide](platforms/github.md) supplies optional GitHub Actions examples. Checks remain advisory and non-blocking.
 
 ## Disappearing URLs
 
@@ -28,7 +28,7 @@ Use the [Static Site Setup standard](site-setup.md) to compare actual published 
 
 ## Real 404 requests
 
-A build cannot reveal which nonexistent URLs visitors or bots requested. For live 404 analysis, **reuse the selected host's analytics, CDN analytics, web-server logs, or existing request logs if available**, on request. Do not install a custom request interceptor, database, or always-on logging pipeline by default. Where the host does not expose request-level paths, report that limitation. See [Cloudflare Static Sites](cloudflare-static-sites.md) for Cloudflare-specific options.
+A build cannot reveal which nonexistent URLs visitors or bots requested. For live 404 analysis, **reuse the selected host's analytics, CDN analytics, web-server logs, or existing request logs if available**, on request. Do not install a custom request interceptor, database, or always-on logging pipeline by default. Where the host does not expose request-level paths, report that limitation. Provider-specific guidance, if needed, belongs in the relevant [platform guide](platforms/cloudflare.md).
 
 Treat any provider's human/bot classifications as **signals, not proof of a real person**. Depending on available data, use bot assessments, verified crawler status, request frequencies, and paths, while noting sampling and access limitations. Distinguish known bot probes (for example, `/wp-admin/`) from likely navigation mistakes, missing previously published pages, and real internal referrers. If the provider exposes only aggregate 404 counts, say that individual URLs or human-vs-bot classifications are unavailable; do not invent them.
 
