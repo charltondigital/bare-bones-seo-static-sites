@@ -7,7 +7,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = fileURLToPath(new URL('../', import.meta.url));
-const script = n => join(repoRoot, 'scripts', n);
+const script = n => join(repoRoot, 'examples', 'scripts', n);
 function fixture(fn) {
   const dir=mkdtempSync(join(tmpdir(),'bare-bones-test-'));
   try { return fn(dir); } finally { rmSync(dir,{recursive:true,force:true}); }
