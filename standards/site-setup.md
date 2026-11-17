@@ -14,6 +14,23 @@
 8. Apply [Links and HTTP Errors](links-http-errors.md) where appropriate: reuse the built-page baseline for removed-URL reporting, generate an external-link CSV as a build artifact, and check supported redirect rules without a full-site spider. Avoid redundant builds. Leave production 404 analytics with the chosen host/CDN or existing logs unless the user asks for deeper logging.
 9. After installation, **execute a representative site build and relevant scripts** where feasible. Verify generated HTML, sitemap, metadata, and reports; disclose skipped checks. A document or workflow file alone does not establish working integration.
 
+## The AI agent is the dashboard
+
+**Do not require a dashboard to make SEO settings visible or manageable.** At installation, briefly tell the user what the agent can show and change through conversation, and how to request it. For ongoing work, offer a relevant view when it would help the current decision, but do not repeat a feature menu on every turn or interrupt unrelated tasks.
+
+Examples of useful requests the agent should support using the actual site source, authoritative settings, generated SEO inventory, and available reports:
+
+- "Show me the title, H1, meta description, canonical, and indexation status for these 10 pages."
+- "Which pages are excluded from the sitemap or marked noindex?"
+- "Show every redirect, and flag any duplicate rules, chains, or loops you can verify."
+- "Which pages have conflicting canonical tags, multiple title elements, or SEO settings that differ from their rendered output?"
+- "What URLs disappeared in the latest build?"
+- "Change the SEO title on this page," or "Exclude this section from the sitemap."
+
+**Explain the capability, then do the work when asked.** Present concise tables or small batches of records, and offer to expand/filter them. Do not make the user find a JSON file, inspect source code, or run a command to answer an ordinary SEO question. Read the relevant source and produce the requested view; use the generated, read-only SEO inventory where available. Distinguish what a settings file *intends* from what the built or live site *actually outputs*. If an inventory is unavailable or stale, regenerate or inspect the relevant pages where feasible; disclose anything unverified instead of inventing results.
+
+**Keep the capability discoverable across sessions.** During installation, create or update an `AGENTS.md` (or equivalent instructions supported by the target agent) in the website repository. Briefly link to the Bare Bones standards and instruct future coding agents to offer conversational SEO visibility and control when relevant. Preserve existing instructions and avoid making the file a substitute for the actual SEO integrations.
+
 ## Agent behavior when changes are proposed
 
 - **Routine edits and new pages:** Proceed normally without additional permission or reporting overhead.
