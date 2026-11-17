@@ -8,7 +8,7 @@
 - **Show consequential URL changes clearly.** For a proposed rename, identify the old URL, new URL, and proposed 301. One approval can cover a batch; do not demand repeated approvals after authorization.
 - **Deletions require a disposition.** For each removed published page, propose a relevant 301 destination or explain why an intentional 404/410 is appropriate. Never redirect all removed pages to the homepage by default.
 - **Keep historical redirects.** Never silently delete or change previously approved mappings, even when their source pages have been gone for years. Ask before changing them.
-- **One authoritative redirect registry.** Prefer a redirect configuration stored in the site's GitHub repository and consumed by its deployment process. Use the deployment host's **actual supported format and features**; do not introduce a second competing registry.
+- **One authoritative redirect registry.** Prefer a redirect configuration stored in the site's source-controlled configuration and consumed by its deployment process. Use the deployment host's **actual supported format and features**; do not introduce a second competing registry.
 - **Routine page edits** require no extra approvals when URLs and redirects remain unchanged.
 
 ## Implementation on the selected host
@@ -24,7 +24,7 @@ Where the host supports a declarative `_redirects` registry, use it as the singl
 
 For other hosts, configure equivalent page-level redirects through their supported mechanism, keeping the authoritative source in version-controlled configuration where possible. Verify actual live HTTP redirect status and destination after deployment. If the host requires dashboard-only settings, report that limitation rather than writing an ineffective file.
 
-**Domain-level hostname, HTTPS, and `www` redirects are infrastructure settings.** Configure them using the selected host's documented capabilities, separate from page-level URL changes. The optional [Cloudflare Static Sites](cloudflare-static-sites.md) guide provides one provider-specific implementation.
+**Domain-level hostname, HTTPS, and `www` redirects are infrastructure settings.** Configure them using the selected host's documented capabilities, separate from page-level URL changes. For provider-specific setup, see the optional [Cloudflare guide](platforms/cloudflare.md).
 
 ## Validation and change reporting
 
