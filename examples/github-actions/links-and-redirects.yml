@@ -1,0 +1,35 @@
+# Install into the target site as .github/workflows/links-and-redirects.yml
+# Adapt build command, domain, and paths to the site's architecture.
+name: SEO link inventory and redirects (advisory)
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  link-reports:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install project dependencies
+        run: npm ci
+      - name: Build site
+        run: npm run build
+      - name: Generate external links CSV
+        # Inventory errors are reported but do not block releases.
+        run: node scripts/external-links.mjs dist https://example.com seo/reports/external-links.csv || true
+      - name: Check redirects (advisory)
+        run: node scripts/check-redirects.mjs public/_redirects dist || true
+      - name: Upload external-link inventory
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: external-links
+          path: seo/reports/external-links.csv
+          if-no-files-found: warn
+          retention-days: 30
