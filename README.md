@@ -1,24 +1,38 @@
 # Bare Bones SEO for Static Sites
 
-**Version 0.1 — initial standards and reusable templates**
+**Version 0.1 — core standards and reusable utilities**
 
-A collection of practical, **hosting-provider-neutral** standards for SEO visibility and control on AI-generated static websites. The [Cloudflare setup guide](cloudflare-static-sites.md) is the explicitly provider-specific exception.
+A minimal, **hosting- and source-control-neutral** approach to SEO visibility and control for AI-maintained static websites.
 
-**Bare Bones enforces the integrity of SEO controls, not the optimization of SEO content.** Settings should have one authoritative owner, survive rebuilds, and be inspectable without telling practitioners what keywords, descriptions, or schema they ought to use. Technical warnings are advisory by default.
+**Bare Bones enforces the integrity of SEO controls, not the optimization of SEO content.** One authoritative owner per setting; preserve explicit decisions; verify generated output; report technical issues without dictating keywords, metadata lengths, or SEO strategy. Advisory checks must not block ordinary builds or deployments by default.
 
-## Available standards
+## Core standards (work on any static host)
 
-- [Static Site Setup](site-setup.md) — have an AI agent install lightweight URL change detection, validation, and reporting during initial site setup.
+1. [Site Setup](site-setup.md) — discover the existing website, integrate the standards into its build, and verify actual output.
+2. [Metadata and Schema](metadata-schema.md) — title defaults to H1; optional centralized overrides; one owner per metadata field.
+3. [Indexation and Search Exclusions](indexation.md) — a single `seo/search-exclusions.json` controls sitemap inclusion and `noindex`.
+4. [301 Redirects](301-redirects.md) — protect established URLs and use the selected host's supported redirect mechanism.
+5. [Links and HTTP Errors](links-http-errors.md) — optional external-link inventory, redirect diagnostics, URL change reports, and host-log-based 404 investigation.
 
-- [Cloudflare Static Sites](cloudflare-static-sites.md) — deploy a new GitHub-based static website using Cloudflare Workers Static Assets, with one canonical HTTPS domain.
-- [301 Redirects for Static Sites](301-redirects.md) — keep page redirects in GitHub with lightweight validation and URL-change safeguards.
-- [Indexation and Search Exclusions](indexation.md) — centralize sitemap and `noindex` controls in `seo/search-exclusions.json`, while keeping crawler rules separate.
-- [Metadata and Schema](metadata-schema.md) — default title to H1, preserve a single owner for each SEO field, and make descriptions optional.
-- [Links and HTTP Errors](links-http-errors.md) — export external links as a build artifact, check simple redirect chains, and reuse the site's own hosting/CDN logs for optional live 404 analysis.
-- [Robots audit template](templates/robots-audit.yml) and [audit script](scripts/check-robots.mjs) — optional, non-blocking crawler access warnings for individual website repositories.
+## Platform guides (use only when relevant)
 
-Each standard is a focused Markdown guide. **A GitHub Actions workflow is a CI option, not a hosting requirement:** a site hosted anywhere can use it if its source is on GitHub. Other CI systems may run the same Node scripts after a build.
+- [GitHub](platforms/github.md) — repository installation, GitHub Actions, advisory checks, and downloadable workflow artifacts. Does **not** assume GitHub hosts the website.
+- [Cloudflare](platforms/cloudflare.md) — Workers Static Assets, domains, DNS, redirects, dashboard operations, and available 404 analytics.
 
-## Installation approach
+Additional hosting, source-control, or CI guides can be added without changing the core standards.
 
-This repository is a **standards and template library**, not an automatically installed plugin. An AI coding agent should read [Site Setup](site-setup.md), inspect the target site's existing build and workflows, copy or adapt only the needed scripts and Actions, and verify the result. Do not blindly copy scripts into every site. **Version 0.1 is the initial documented baseline, not a published GitHub release or validated cross-framework installer.** The reusable Node utilities have regression tests in [GitHub Actions](.github/workflows/validate-scripts.yml); build integration, hosting rules, and SEO settings still require target-site adaptation and verification.
+## Reusable implementation files
+
+- `scripts/` — portable Node.js utilities to inventory external links, check simple `_redirects` rules, and flag possible crawler blocks. These scripts are examples to adapt, **not automatically installed**.
+- `templates/github/` — example GitHub Actions workflows. They are GitHub-specific, Node-oriented templates, **not** universal build configurations.
+- `tests/` — deterministic Node tests for the scripts, Markdown links, and JSON examples.
+
+## Installation by an AI coding agent
+
+1. Read [Site Setup](site-setup.md) and the relevant core standards.
+2. Inspect the target site's actual generator, deployment host, version-control environment, and existing CI.
+3. Read [GitHub](platforms/github.md), [Cloudflare](platforms/cloudflare.md), or both **only if the target site uses them**.
+4. Adapt and install only the missing components. Preserve existing published URLs, metadata, redirect decisions, and site behavior.
+5. Build the target site, verify its rendered metadata, sitemap, robots directives, and any installed audits; report what was and was not validated.
+
+**Version 0.1** is a standards baseline, not a published cross-platform installer. Passing repository regression tests do **not** demonstrate complete installation on every framework or hosting provider.
