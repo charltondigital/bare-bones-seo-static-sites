@@ -34,7 +34,7 @@ For a Worker configured to serve Static Assets, Cloudflare supports declarative 
 /old-page/ /new-page/ 301
 ```
 
-Check [Workers Static Assets redirect syntax and constraints](https://developers.cloudflare.com/workers/static-assets/redirects/) for support, matching order, limits, and interaction with Worker request handlers. If a custom Worker handles requests first, do not assume that `_redirects` applies to that response. Avoid duplicate page redirects in separate Cloudflare dashboard and source-file mechanisms. The optional `check-redirects.mjs` script checks only simple static `_redirects` entries and **does not** evaluate Cloudflare zone redirect rules.
+Check [Workers Static Assets redirect syntax and constraints](https://developers.cloudflare.com/workers/static-assets/redirects/) for support, matching order, limits, and interaction with Worker request handlers. If a custom Worker handles requests first, do not assume that `_redirects` applies to that response. Avoid duplicate page redirects in separate Cloudflare dashboard and source-file mechanisms. An agent can write a lightweight checker for simple static `_redirects` entries, but it must **not** claim to validate Cloudflare zone-level redirect rules.
 
 ### Live 404s and bot signals
 
