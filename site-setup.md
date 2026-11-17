@@ -6,10 +6,11 @@
 
 1. Inspect and reuse the site's existing build and GitHub workflow. Avoid additional dependencies and redundant Actions.
 2. Establish a baseline of previously published HTML page URLs from known-good build output or a sitemap verified against the output. Normalize trailing slashes and `index.html`; do not guess paths from source filenames.
-3. Add a fast, deterministic comparison of the proposed output and existing `_redirects` registry against that baseline. Integrate with existing CI when practical; the agent handles setup, not the user.
-4. Report meaningful differences (new, removed, or changed URLs; added, removed, or modified 301s; duplicate redirects, chains, loops, and missing targets). Keep unchanged builds quiet.
-5. **Reporting is advisory by default.** URL warnings must **not fail CI, stop a build, prevent a merge, or block deployment**. Do not add required status checks, branch protections, approval gates, or blocking GitHub rulesets for this system unless the user separately requests them.
-6. When actually implementing the checks in a site, verify they run as intended when convenient. Do not claim enforcement exists merely because a workflow was created.
+3. Create `seo/sitemap-exclusions.json` with `{ "exclude": [] }` if it does not exist. Wire the sitemap generator to read and apply its rules on **every build**, before emitting sitemap XML; preserve existing generator structure and existing exclusion rules. Support exact page paths and section patterns. Follow [Indexation and Sitemaps](indexation.md) for matching semantics and output verification.
+4. Add a fast, deterministic comparison of the proposed output and existing `_redirects` registry against that baseline. Integrate with existing CI when practical; the agent handles setup, not the user.
+5. Report meaningful differences (new, removed, or changed URLs; added, removed, or modified 301s; duplicate redirects, chains, loops, and missing targets). Keep unchanged builds quiet.
+6. **Reporting is advisory by default.** URL warnings must **not fail CI, stop a build, prevent a merge, or block deployment**. Do not add required status checks, branch protections, approval gates, or blocking GitHub rulesets for this system unless the user separately requests them.
+7. When actually implementing the checks in a site, verify they run as intended when convenient. Do not claim enforcement exists merely because a workflow was created.
 
 ## Agent behavior when changes are proposed
 
@@ -26,4 +27,4 @@ Use a small script, build output, and the redirect file. No live-site crawl, AI 
 
 **Principle:** AI should move quickly. Detect and surface risks; never turn this standard into automated deployment bureaucracy.
 
-**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) covers domains and hosting; [301 Redirects](301-redirects.md) covers page-level redirects.
+**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) covers domains and hosting; [301 Redirects](301-redirects.md) covers page-level redirects; [Indexation and Sitemaps](indexation.md) covers sitemap exclusions.
