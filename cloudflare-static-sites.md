@@ -47,9 +47,7 @@ This is a forward-looking setup standard for new sites, regardless of static-sit
 - **Safety checks:** Never invent existing settings or overwrite unrelated DNS records. If an import replaces an entire list or zone, explain that clearly and inspect the complete intended result before suggesting it.
 - **Verification:** After changes, use a live test or an export if helpful; don't automatically demand an export when a simpler verification works.
 
-**Scope:** This guide covers domain-level hostname canonicalization (`www` and HTTPS). Page-level URL redirects belong in the separate [GitHub Redirect Management](github-redirect-management.md) standard.
-
-**Production redirects remain human-controlled:** Agents may prepare and recommend redirect changes, but may not autonomously apply them. The user may review and implement them directly in Cloudflare.
+**Scope:** This guide covers domain-level hostname canonicalization (`www` and HTTPS). Page-level redirects are governed separately by [301 Redirects for Static Sites](301-redirects.md) and are managed in the site's GitHub repository.
 
 ## Official references
 
