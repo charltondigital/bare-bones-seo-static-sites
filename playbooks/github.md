@@ -7,15 +7,19 @@
 1. Inspect the website's existing repository, build tooling, package manager, deployment pipeline, GitHub workflows, and host. Read [Site Setup](../standards/site-setup.md) and the other core standards before modifying anything.
 2. Preserve existing published URLs, redirects, metadata, indexation and deployment configuration. Integrate the core settings into the website's actual build. Do **not** assume GitHub Actions can enforce SEO settings without those integrations.
 3. Use existing workflows and build outputs where practical. Only add scripts and Actions that serve the site's needs; never add a second site build unnecessarily.
-4. If adding workflows, commit them under `.github/workflows/` in the **target website repository**. The examples below require adapting paths and package/build commands; the files in this standards repository are **not installed automatically**.
+4. If adding workflows, commit them under `.github/workflows/` in the **target website repository**. Generate workflows tailored to the actual project; this playbook does not ship mandatory templates.
 5. Execute the actual site build and relevant audits, confirm artifacts and generated output, and disclose any unverified integrations. Keep warning checks non-blocking by default.
 
-## Reusable scripts and Actions
+## GitHub Actions design
 
-- [External-link inventory](../examples/scripts/external-links.mjs) generates a CSV from built HTML, with each external URL and its linking page. Upload the CSV using `actions/upload-artifact`; do not commit regenerated reports on every build.
-- [Redirect checker](../examples/scripts/check-redirects.mjs) checks **only** straightforward static `_redirects` rules for possible chains, loops, and other issues. **First confirm the host supports this format**; choose another checker when the site uses a different redirect mechanism.
-- [Robots audit](../examples/scripts/check-robots.mjs) reads the **generated** `robots.txt` (and optionally the sitemap), and issues advisory warnings about potentially blocked search and AI-search crawlers. Never alter crawler rules automatically.
-- [Links and redirects workflow template](../examples/github-actions/links-and-redirects.yml) and [robots workflow template](../examples/github-actions/robots-audit.yml) are examples for **Node-based** site builds. Adapt to the site's language, dependency manager, output path, target hostname, and preexisting CI. These examples use GitHub-hosted workflow artifacts, not a persistent reporting database.
+An AI coding agent can create small, deterministic checks using the site's existing language and build tooling:
+
+- **External links:** After building, extract outgoing HTTP(S) hyperlinks with referring page paths. Emit a CSV with `external_url,source_page` and upload it using `actions/upload-artifact` instead of repeatedly committing reports.
+- **Redirect validation:** Inspect the authoritative redirect configuration for duplicate sources, chains, loops, and missing local targets. Check what the host actually supports; do not assume all hosts consume `_redirects`.
+- **Robots warnings:** Read the built `robots.txt` and, when useful, the sitemap; warn about possible accidental blocks of search and AI-search crawlers. Never automatically rewrite crawler rules.
+- **URL history:** Compare published-page URLs to the prior known-good baseline to detect unexpected removals or renames. Preserve past approved redirects.
+
+Build once where practical; use `actions/checkout`, the necessary runtime and project build steps, then run lightweight checks. Use `GITHUB_STEP_SUMMARY` for short findings and `actions/upload-artifact` for generated inventories. Adjust events, branch names, package manager, and output directories to the site rather than copying generic templates.
 
 On GitHub, workflow warnings should be visible in run logs or `GITHUB_STEP_SUMMARY`. Keep advisory checks from failing or stopping deployments. Do not create branch protections, required checks, approval gates, or recurring notifications by default.
 
