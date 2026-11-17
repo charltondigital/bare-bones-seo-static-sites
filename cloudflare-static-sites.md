@@ -22,6 +22,19 @@ This is a forward-looking setup standard for new sites, regardless of static-sit
 
 **Principle:** One serving hostname, one WWW redirect rule, no duplicate redirect mechanisms. **Bulk Redirects aren't needed** for this new Workers setup. Preserve unrelated DNS records such as email MX/SPF/DKIM/DMARC.
 
+## URL and redirect protection policy for AI agents
+
+**Existing public URLs are protected.** Agents must not change, delete, or move an existing page URL (including its slug, path, or permalink structure) without **explicit user approval**. This applies during redesigns, content edits, migrations, and navigation restructuring.
+
+If a URL change is proposed, the agent must:
+
+1. Show the **exact old and proposed new URLs** and explain the reason for the change.
+2. Explain that existing links and search visibility may be affected.
+3. Obtain explicit approval **before making the URL change**.
+4. Advise the user to create and verify a **301 redirect in Cloudflare** from the old URL to the new URL, preserving relevant query strings. Do not change the URL until the redirect plan is confirmed.
+
+**Redirect ownership:** Agents may inspect existing redirects and recommend changes, but must **not autonomously create, edit, or delete production redirect rules**, whether in Cloudflare, a `_redirects` file, or application code. Production redirect changes require explicit human authorization and review.
+
 ## Official references
 
 - [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/)
