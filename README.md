@@ -2,13 +2,16 @@
 
 A collection of practical standards for **SEO visibility and control on static AI-generated websites**.
 
+**Bare Bones enforces the integrity of SEO controls, not the optimization of SEO content.** Settings should have one authoritative owner, survive rebuilds, and be inspectable without telling practitioners what keywords, descriptions, or schema they ought to use. Technical warnings are advisory by default.
+
 ## Available standards
 
 - [Static Site Setup](site-setup.md) — have an AI agent install lightweight URL change detection, validation, and reporting during initial site setup.
 
 - [Cloudflare Static Sites](cloudflare-static-sites.md) — deploy a new GitHub-based static website using Cloudflare Workers Static Assets, with one canonical HTTPS domain.
 - [301 Redirects for Static Sites](301-redirects.md) — keep page redirects in GitHub with lightweight validation and URL-change safeguards.
-- [Indexation and Crawling](indexation.md) — centralize sitemap and `noindex` controls in `seo/search-exclusions.json`, while keeping crawler rules separate.
+- [Indexation and Search Exclusions](indexation.md) — centralize sitemap and `noindex` controls in `seo/search-exclusions.json`, while keeping crawler rules separate.
+- [Metadata and Schema](metadata-schema.md) — default title to H1, preserve a single owner for each SEO field, and make descriptions optional.
 - [Robots audit template](templates/robots-audit.yml) and [audit script](scripts/check-robots.mjs) — optional, non-blocking crawler access warnings for individual website repositories.
 
 Each standard is a focused Markdown guide. No legacy migration procedures or general optimization advice are included in the Cloudflare guide.
