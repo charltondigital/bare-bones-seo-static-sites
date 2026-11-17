@@ -1,64 +1,74 @@
 # Indexation and Crawling
 
-**Purpose:** Give SEO practitioners durable visibility and control over sitemap inclusion, indexing directives, and crawler access without reorganizing a static website or slowing routine AI-assisted development.
+**Purpose:** Give SEO practitioners fast, durable control over sitemap membership and `noindex`, without reading every page during routine AI-assisted work.
 
-## Sitemap exclusions
+## One authoritative indexation file
 
-The site setup agent creates `seo/sitemap-exclusions.json` and integrates it with the **existing** sitemap generator. The generator must read the file and apply the exclusion rules before outputting sitemap URLs on every build. Don't replace a working generator merely to support exclusions.
-
-Example:
+During [Static Site Setup](site-setup.md), create `seo/indexation.json` and connect it to the site's existing sitemap generator **and** page rendering pipeline. The file is the authoritative control for intentional sitemap inclusion and page-level `noindex` exceptions.
 
 ```json
 {
-  "exclude": [
-    "/counties/",
-    "/counties/*",
-    "/research/old-study/"
-  ]
+  "defaults": {
+    "index": true,
+    "sitemap": true
+  },
+  "sections": {
+    "/counties/*": {
+      "index": true,
+      "sitemap": false
+    }
+  },
+  "pages": {
+    "/research/old-study/": {
+      "index": false,
+      "sitemap": false
+    },
+    "/privacy/": {
+      "index": true,
+      "sitemap": false
+    }
+  }
 }
 ```
 
-- Exact entries, such as `/research/old-study/`, exclude **one page**.
-- A trailing `/*`, such as `/counties/*`, excludes descendants in that section; it must not unexpectedly match unrelated prefixes such as `/counties-old/`.
-- Include the section's landing page separately (for example `/counties/`) if that page should also be excluded.
-- Normalize trailing slashes and `index.html` consistently before matching. Avoid loose substring or ambiguous glob matching.
-- Keep existing rules unless the user explicitly requests a change. Agents must read this file **before modifying, regenerating, or replacing sitemap-generation logic** and ensure the new generator still honors it.
-- On a requested change, update the exclusion list and verify the **generated sitemap** reflects the rule. The list is a control input, not a separate manually maintained sitemap.
+- **`index: false`** emits `noindex` in the rendered HTML (or an appropriate `X-Robots-Tag` for applicable non-HTML resources). **`index: true`** means no `noindex` restriction from this system; it does *not* guarantee search-engine indexing.
+- **`sitemap: false`** omits a URL from the generated XML sitemap; it does not remove the page or prevent indexing.
+- An exact page entry overrides its matching section rule; section rules override defaults. For overlapping section patterns, use the most specific match and deterministic tie handling; flag ambiguous conflicts.
+- Exact paths cover individual pages. `/counties/*` covers descendants, **not** the section landing page `/counties/`; add that path separately when desired.
+- Normalize URL paths consistently (including trailing slashes and `index.html`) before matching. Never match unrelated prefixes accidentally.
+- Only exceptions need to be recorded. Ordinary pages inherit `index: true` and `sitemap: true` unless the project's baseline requires other intentional defaults.
 
-## Visibility and changes
+## Build-time integration and preservation
 
-An AI agent should locate the site's current sitemap(s), inspect how they are generated, and explain their contents in ordinary SEO terms. It should be able to show included and excluded URLs, add or remove individual exclusions, and apply section-wide exclusions without asking the user to know where the site stores its routes. Choose the smallest change using the site's existing architecture.
+The agent should adapt the **existing** site generator, not reorganize the website. On each build:
 
-Use a fast advisory check to report if an excluded URL appears in sitemap output; do not block routine deployments by default. An exclusions file alone is not effective unless the generator is wired to consume it.
+1. Read `seo/indexation.json` once in shared build code (or the framework's equivalent).
+2. Resolve a page's effective rules when generating its HTML robots directives.
+3. Filter sitemap URLs through the same rules **before** writing XML. No manual post-processing or duplicate sitemap lists.
+4. Preserve `indexation.json` and these integrations during rebuilds, refactors, and framework updates.
 
-## Page and section indexation
+**One-time onboarding matters:** Inspect existing `noindex` tags, response headers, route metadata, sitemap filters, and existing exclusions before switching to centralized control. Preserve intentional settings by migrating them to `indexation.json` or clearly reporting exceptions that cannot be integrated. Do not blindly override existing privacy, staging, or indexation protections. Later agents can read the compact JSON to understand intended exceptions; they need not reread every page on every task.
 
-When asked what can be indexed, inspect the existing built HTML and HTTP headers for robots directives (including `noindex`), not merely the source templates. Locate how page-level and section-level defaults or overrides are currently implemented; change the smallest relevant setting in that system rather than adding competing configuration files. Support individual pages and site sections.
+## Visibility, changes, and verification
 
-An agent should be able to show which pages are indexable, which are marked `noindex`, and where those rules originate. Verify requested changes in the generated HTML or headers. Indexability is not a guarantee that Google has indexed the page.
+When asked, show effective rules for specific URLs or a section, distinguish configured policy from rendered behavior, and update the smallest relevant JSON entries. Do not require the SEO practitioner to know the framework's file structure.
+
+Use small deterministic, **advisory** build checks to compare the generated sitemap and relevant rendered `noindex` directives with the configuration. Report mismatches, including `noindex` URLs still listed in the sitemap, without failing builds or blocking deployments by default. A changed exclusion file is not enough: the generated output must honor it.
 
 ## Crawling and robots.txt
 
-Find and inspect the site's actual `robots.txt` and any framework or deployment rules generating it. Explain `Allow`, `Disallow`, user-agent-specific directives, and declared sitemap locations in plain language. For requested crawling changes, preserve unrelated rules, make the narrowest change, and inspect the generated `robots.txt`.
+Keep `robots.txt` **separate** from `indexation.json` because crawl access is not the same as indexation. Agents should locate the generated or static `robots.txt`, summarize `Allow`/`Disallow` rules by crawler and section, and make narrow requested changes while preserving unrelated directives.
 
-**Never use `Disallow` as a substitute for `noindex`.** A blocked crawler may be unable to read a page's `noindex` directive. Also, `robots.txt` is not access control or a way to protect private content.
+**Never assume `Disallow` produces `noindex`.** A blocked crawler may not see a page's `noindex`. `robots.txt` is not access control for private content.
 
-## Agent workflow and safeguards
+## Decision guidance
 
-1. **Discover:** Locate sitemap generation, sitemap exclusions, `robots.txt`, and rendered robots directives within the site's existing architecture.
-2. **Explain:** Show the requested page or section's sitemap, crawl, and indexation status. Distinguish site intent from actual Google indexing.
-3. **Change:** Apply only the requested controls. Keep the sitemap exclusions file authoritative for sitemap membership; don't introduce a second indexation configuration unless genuinely necessary.
-4. **Verify:** Inspect the generated output for affected URLs and summarize the results. Warn about mismatches such as `noindex` pages blocked from crawling, without blocking routine deployments by default.
+- **Remove from sitemap:** Set `sitemap: false`; leave `index` unchanged unless requested.
+- **Keep a live page out of search results:** Set `index: false` and ordinarily `sitemap: false`; verify the page remains crawlable long enough for search engines to see `noindex`.
+- **Block crawling:** Review `robots.txt` and explain possible indexation tradeoffs.
+- **Delete or rename a page:** Follow [301 Redirects](301-redirects.md); discuss relevant redirects versus 404/410 before changing published URLs.
+- **Determine what Google actually indexed:** Use Search Console data. Site settings only describe intended behavior.
 
-Use judgment about clarification: ordinary page-level changes should be fast; for broad sitewide crawling or `noindex` changes, explain their impact before applying. Do not demand repetitive approvals for an already-authorized set of changes.
+**Agent behavior:** Favor inspection, clear reporting, and rapid execution. Explain material sitewide indexation changes before applying; don't require repetitive approval for actions already authorized. Don't introduce a second SEO-control system or block routine deployments.
 
-## Distinguish sitemap inclusion from Google indexation
-
-**Sitemap omission is not `noindex`.** A page excluded from the XML sitemap can still be discovered and indexed.
-
-- To keep a live page out of search results, use an appropriate page-level `noindex` directive, verified in rendered HTML or response headers.
-- To restrict crawling, use `robots.txt` deliberately; do not block crawling of a page when search engines need to see its `noindex`.
-- For a deleted page, decide whether a relevant 301 or a 404/410 is appropriate under [301 Redirects](301-redirects.md).
-- Search Console data is needed to establish what Google has actually indexed. Site directives alone show intended behavior, not Google's live indexing status.
-
-**Principle:** Preserve explicit SEO decisions through rebuilds, expose them clearly, and let agents handle implementation without adding unnecessary bureaucracy.
+**Principle:** One small file controls sitemap and `noindex` exceptions; `robots.txt` remains separate. AI handles the implementation, SEO practitioners control the policy.
