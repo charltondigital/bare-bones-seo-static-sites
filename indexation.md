@@ -1,4 +1,4 @@
-# Indexation and Crawling
+# Indexation and Search Exclusions
 
 **Purpose:** Give SEO practitioners fast, durable control over sitemap membership and `noindex`, without reading every page during routine AI-assisted work.
 
@@ -55,20 +55,22 @@ When asked, show effective rules for specific URLs or a section, distinguish con
 
 Use small deterministic, **advisory** build checks to compare the generated sitemap and relevant rendered `noindex` directives with the configuration. Report mismatches, including `noindex` URLs still listed in the sitemap, without failing builds or blocking deployments by default. A changed exclusion file is not enough: the generated output must honor it.
 
-## Crawling and robots.txt
+## Advisory robots.txt checks only
 
-Keep `robots.txt` **separate** from `search-exclusions.json` because crawl access is not the same as indexation. Agents should locate the generated or static `robots.txt`, summarize `Allow`/`Disallow` rules by crawler and section, and make narrow requested changes while preserving unrelated directives.
+Do **not** reorganize, automatically manage, or rewrite `robots.txt` as part of this standard. On initial setup or when relevant, inspect its current rules and **warn only** about possible accidental blocks of search crawlers (such as Googlebot or Bingbot), especially where a blocked page is intended to be indexable or must be crawled to see `noindex`.
 
-**Never assume `Disallow` produces `noindex`.** A blocked crawler may not see a page's `noindex`. `robots.txt` is not access control for private content.
+Distinguish between search-indexing crawlers, AI search/retrieval crawlers, and AI training crawlers; their purposes and crawler identities differ. **Do not assume that blocking an AI training crawler is a mistake.** Explain any ambiguous or broad rules without prescribing a universal bot-allow policy.
+
+Do not alter crawler permissions without a specific user request. `robots.txt` is not an access-control mechanism, and a `Disallow` rule does not reliably remove an already discovered URL from search results.
 
 ## Decision guidance
 
 - **Remove from sitemap:** Set `sitemap: false`; leave `index` unchanged unless requested.
 - **Keep a live page out of search results:** Set `index: false` and ordinarily `sitemap: false`; verify the page remains crawlable long enough for search engines to see `noindex`.
-- **Block crawling:** Review `robots.txt` and explain possible indexation tradeoffs.
+- **Crawler restrictions:** Warn about suspicious or conflicting `robots.txt` rules; leave changes to a separate, explicit user request.
 - **Delete or rename a page:** Follow [301 Redirects](301-redirects.md); discuss relevant redirects versus 404/410 before changing published URLs.
 - **Determine what Google actually indexed:** Use Search Console data. Site settings only describe intended behavior.
 
 **Agent behavior:** Favor inspection, clear reporting, and rapid execution. Explain material sitewide indexation changes before applying; don't require repetitive approval for actions already authorized. Don't introduce a second SEO-control system or block routine deployments.
 
-**Principle:** One small file controls sitemap and `noindex` exceptions; `robots.txt` remains separate. AI handles the implementation, SEO practitioners control the policy.
+**Principle:** One small file controls sitemap and `noindex` exceptions. Treat `robots.txt` as an advisory check, not another routine configuration task. AI handles the implementation, SEO practitioners control the policy.
