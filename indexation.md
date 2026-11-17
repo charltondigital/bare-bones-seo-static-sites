@@ -4,7 +4,7 @@
 
 ## One authoritative indexation file
 
-During [Static Site Setup](site-setup.md), create `seo/indexation.json` and connect it to the site's existing sitemap generator **and** page rendering pipeline. The file is the authoritative control for intentional sitemap inclusion and page-level `noindex` exceptions.
+During [Static Site Setup](site-setup.md), create `seo/search-exclusions.json` and connect it to the site's existing sitemap generator **and** page rendering pipeline. The file is the authoritative control for intentional sitemap inclusion and page-level `noindex` exceptions.
 
 ```json
 {
@@ -42,12 +42,12 @@ During [Static Site Setup](site-setup.md), create `seo/indexation.json` and conn
 
 The agent should adapt the **existing** site generator, not reorganize the website. On each build:
 
-1. Read `seo/indexation.json` once in shared build code (or the framework's equivalent).
+1. Read `seo/search-exclusions.json` once in shared build code (or the framework's equivalent).
 2. Resolve a page's effective rules when generating its HTML robots directives.
 3. Filter sitemap URLs through the same rules **before** writing XML. No manual post-processing or duplicate sitemap lists.
-4. Preserve `indexation.json` and these integrations during rebuilds, refactors, and framework updates.
+4. Preserve `search-exclusions.json` and these integrations during rebuilds, refactors, and framework updates.
 
-**One-time onboarding matters:** Inspect existing `noindex` tags, response headers, route metadata, sitemap filters, and existing exclusions before switching to centralized control. Preserve intentional settings by migrating them to `indexation.json` or clearly reporting exceptions that cannot be integrated. Do not blindly override existing privacy, staging, or indexation protections. Later agents can read the compact JSON to understand intended exceptions; they need not reread every page on every task.
+**One-time onboarding matters:** Inspect existing `noindex` tags, response headers, route metadata, sitemap filters, and existing exclusions before switching to centralized control. Preserve intentional settings by migrating them to `search-exclusions.json` or clearly reporting exceptions that cannot be integrated. Do not blindly override existing privacy, staging, or indexation protections. Later agents can read the compact JSON to understand intended exceptions; they need not reread every page on every task.
 
 ## Visibility, changes, and verification
 
@@ -57,7 +57,7 @@ Use small deterministic, **advisory** build checks to compare the generated site
 
 ## Crawling and robots.txt
 
-Keep `robots.txt` **separate** from `indexation.json` because crawl access is not the same as indexation. Agents should locate the generated or static `robots.txt`, summarize `Allow`/`Disallow` rules by crawler and section, and make narrow requested changes while preserving unrelated directives.
+Keep `robots.txt` **separate** from `search-exclusions.json` because crawl access is not the same as indexation. Agents should locate the generated or static `robots.txt`, summarize `Allow`/`Disallow` rules by crawler and section, and make narrow requested changes while preserving unrelated directives.
 
 **Never assume `Disallow` produces `noindex`.** A blocked crawler may not see a page's `noindex`. `robots.txt` is not access control for private content.
 
