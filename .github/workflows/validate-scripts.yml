@@ -1,9 +1,9 @@
-name: Validate reusable scripts
+name: Validate scripts and documentation
 on:
   push:
     branches: [main]
     paths:
-      - 'scripts/**'
+      - 'scripts/**'\n      - 'platforms/**'\n      - 'templates/**'\n      - '*.md'
       - 'tests/**'
       - '.github/workflows/validate-scripts.yml'
   pull_request:
