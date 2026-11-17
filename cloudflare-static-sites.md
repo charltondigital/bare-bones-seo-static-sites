@@ -43,24 +43,13 @@ This is a forward-looking setup standard for new sites, regardless of static-sit
 - **Reviewing existing configuration:** Ask for an export when it would help identify conflicts, unknown records, or the full scope of changes. For a straightforward setting that can be verified directly, use the dashboard instead.
 - **Making changes:** Offer a correctly formatted import file when Cloudflare supports it and it meaningfully saves time or reduces errors. For one or two simple settings, direct dashboard instructions may be easier.
 - **User-operated changes:** Explain the changes and provide the instructions or file for the user to review and apply. The user does **not** need to give the agent separate approval before performing the actions themselves.
-- **Agent-operated changes:** When the agent will directly change live infrastructure, seek the user's authorization before consequential or potentially disruptive actions, and comply with the separate URL/redirect restrictions below.
+- **Agent-operated changes:** When the agent will directly change live infrastructure, seek the user's authorization before consequential or potentially disruptive actions.
 - **Safety checks:** Never invent existing settings or overwrite unrelated DNS records. If an import replaces an entire list or zone, explain that clearly and inspect the complete intended result before suggesting it.
 - **Verification:** After changes, use a live test or an export if helpful; don't automatically demand an export when a simpler verification works.
 
+**Scope:** This guide covers domain-level hostname canonicalization (`www` and HTTPS). Page-level URL redirects belong in the separate [GitHub Redirect Management](github-redirect-management.md) standard.
+
 **Production redirects remain human-controlled:** Agents may prepare and recommend redirect changes, but may not autonomously apply them. The user may review and implement them directly in Cloudflare.
-
-## URL and redirect protection policy for AI agents
-
-**Existing public URLs are protected.** Agents must not change, delete, or move an existing page URL (including its slug, path, or permalink structure) without **explicit user approval**. This applies during redesigns, content edits, migrations, and navigation restructuring.
-
-If a URL change is proposed, the agent must:
-
-1. Show the **exact old and proposed new URLs** and explain the reason for the change.
-2. Explain that existing links and search visibility may be affected.
-3. Obtain explicit approval **before making the URL change**.
-4. Advise the user to create and verify a **301 redirect in Cloudflare** from the old URL to the new URL, preserving relevant query strings. Do not change the URL until the redirect plan is confirmed.
-
-**Redirect ownership:** Agents may inspect existing redirects and recommend changes, but must **not autonomously create, edit, or delete production redirect rules**, whether in Cloudflare, a `_redirects` file, or application code. Production redirect changes require explicit human authorization and review.
 
 ## Official references
 
