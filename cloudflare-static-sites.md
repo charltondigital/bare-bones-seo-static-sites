@@ -36,22 +36,18 @@ This is a forward-looking setup standard for new sites, regardless of static-sit
 - Only reuse identifiers from the user's supplied link for the **same account/domain**; don't infer that they apply to other accounts or domains.
 - A dashboard link provides navigation context, **not authentication or permission to change settings**. Ask for approval before changes.
 
-## Export, review, and import workflow for AI agents
+## Practical export and import guidance for AI agents
 
-**Prefer inspecting an existing configuration over guessing.** When Cloudflare supports exporting relevant settings, ask the user to provide the export (for example, DNS records or redirect entries). Review it for current settings, conflicts, duplicates, and dependencies before recommending a change. Never treat a partial export as a complete account audit.
+**Choose the simplest reliable workflow for the situation.** Consider whether an existing Cloudflare export would materially improve understanding, and whether an upload-ready file would be more convenient than making a few dashboard changes. Neither is mandatory.
 
-**Prefer ready-to-import files where Cloudflare actually supports import.** For example, prepare a DNS zone-file or redirect CSV only if that feature's current import format and scope are verified. Do not assume all Rules, SSL/TLS options, or Workers settings can be imported.
+- **Reviewing existing configuration:** Ask for an export when it would help identify conflicts, unknown records, or the full scope of changes. For a straightforward setting that can be verified directly, use the dashboard instead.
+- **Making changes:** Offer a correctly formatted import file when Cloudflare supports it and it meaningfully saves time or reduces errors. For one or two simple settings, direct dashboard instructions may be easier.
+- **User-operated changes:** Explain the changes and provide the instructions or file for the user to review and apply. The user does **not** need to give the agent separate approval before performing the actions themselves.
+- **Agent-operated changes:** When the agent will directly change live infrastructure, seek the user's authorization before consequential or potentially disruptive actions, and comply with the separate URL/redirect restrictions below.
+- **Safety checks:** Never invent existing settings or overwrite unrelated DNS records. If an import replaces an entire list or zone, explain that clearly and inspect the complete intended result before suggesting it.
+- **Verification:** After changes, use a live test or an export if helpful; don't automatically demand an export when a simpler verification works.
 
-**Mandatory human review before application:**
-1. Show the proposed additions, removals, and modifications in plain language, including which settings will stay untouched.
-2. Provide the complete draft file for the user's review; flag sensitive records, destructive changes, and any uncertainty.
-3. Ask for explicit approval of the proposed changes **before** importing, uploading, or applying them. Creating a reviewable draft is not authorization to deploy it.
-4. Once approved, provide the import-ready file and a direct dashboard link when possible, or perform the approved operation only if an authorized tool supports it.
-5. After import, request a fresh export or check the live behavior to verify the result; report any discrepancies.
-
-**Never fabricate or overwrite unknown existing settings.** Preserve email records and other unrelated DNS configuration. If the import method replaces an entire list or zone instead of merging records, clearly warn the user and require review of the complete resulting set. If no safe import/export route exists, use minimal manual instructions instead.
-
-**Redirect restriction remains in force:** Agents can prepare proposed redirect entries for review, but must not autonomously apply production 301 changes. Cloudflare is the designated place for production redirects, unless the user explicitly approves an exception.
+**Production redirects remain human-controlled:** Agents may prepare and recommend redirect changes, but may not autonomously apply them. The user may review and implement them directly in Cloudflare.
 
 ## URL and redirect protection policy for AI agents
 
