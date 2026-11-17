@@ -11,7 +11,8 @@
 5. Add a fast, deterministic comparison of the proposed output and existing `_redirects` registry against that baseline. Integrate with existing CI when practical; the agent handles setup, not the user.
 6. Report meaningful differences (new, removed, or changed URLs; added, removed, or modified 301s; duplicate redirects, chains, loops, and missing targets). Keep unchanged builds quiet.
 7. **Reporting is advisory by default.** URL warnings must **not fail CI, stop a build, prevent a merge, or block deployment**. Do not add required status checks, branch protections, approval gates, or blocking GitHub rulesets for this system unless the user separately requests them.
-8. When actually implementing the checks in a site, verify they run as intended when convenient. Do not claim enforcement exists merely because a workflow was created.
+8. Apply [Links and HTTP Errors](links-http-errors.md) where appropriate: reuse the built-page baseline for removed-URL reporting, configure an external-link CSV as a GitHub Action artifact, and check simple redirect chains without a full-site spider. Avoid redundant builds and leave production 404 analytics in Cloudflare unless the user specifically asks for deeper logging.
+9. When actually implementing the checks in a site, verify they run as intended when convenient. Do not claim enforcement exists merely because a workflow was created.
 
 ## Agent behavior when changes are proposed
 
@@ -24,8 +25,8 @@
 
 ## Efficiency
 
-Use a small script, build output, and the redirect file. No live-site crawl, AI call per build, separate database, dashboard, recurring notification, or manual GitHub Action setup. The agent should choose the simplest implementation appropriate to the site, and avoid needless reporting for harmless changes.
+Use a small script, build output, and the redirect file. No mandatory live-site crawl, AI call per build, separate database, dashboard, recurring notification, or manual GitHub Action setup. The agent should choose the simplest implementation appropriate to the site, and avoid needless reporting for harmless changes.
 
 **Principle:** AI should move quickly. Detect and surface risks; never turn this standard into automated deployment bureaucracy.
 
-**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) covers domains and hosting; [301 Redirects](301-redirects.md) covers page-level redirects; [Indexation and Search Exclusions](indexation.md) covers shared sitemap and `noindex` controls; [Metadata and Schema](metadata-schema.md) covers single-owner SEO metadata.
+**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) covers domains and hosting; [301 Redirects](301-redirects.md) covers page-level redirects; [Indexation and Search Exclusions](indexation.md) covers shared sitemap and `noindex` controls; [Metadata and Schema](metadata-schema.md) covers single-owner SEO metadata; [Links and HTTP Errors](links-http-errors.md) covers link inventory, redirect validation, and 404 interpretation.
