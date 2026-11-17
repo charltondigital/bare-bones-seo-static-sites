@@ -6,21 +6,21 @@
 
 After a static site build, extract distinct outgoing HTTP(S) hyperlinks from generated HTML along with each referring site's page path. Export a CSV with **`external_url`** and **`source_page`** columns, one row per destination/source combination. Do **not** automatically visit, score, or test these external URLs.
 
-Use the reusable [external link inventory script](../examples/scripts/external-links.mjs), adapting the script if the target site has additional rendering formats. Example:
+Have the AI agent implement extraction with the site's existing build tools; avoid adding an unrelated runtime solely for this report. A conceptual command might be:
 
 ```sh
-node scripts/external-links.mjs dist https://example.com seo/reports/external-links.csv
+<site-specific-build-command> && <site-specific-inventory-command>
 ```
 
-`seo/reports/external-links.csv` is a **generated output location**, not an authoritative SEO configuration file. Keep it as a **build or CI artifact**, not an automatically committed file. The [GitHub guide](../playbooks/github.md) explains GitHub Actions artifacts. Add generated reports to `.gitignore` in the website repository if needed. The user may download the CSV, run it through a spider or link-checking tool, or ignore it. Never require the user to fix or inspect these links.
+`seo/reports/external-links.csv` is a **generated output location**, not an authoritative SEO configuration file. Keep it as a **build or CI artifact**, not an automatically committed file. The [GitHub playbook](../playbooks/github.md) explains GitHub Actions artifacts. Add generated reports to `.gitignore` in the website repository if needed. The user may download the CSV, run it through a spider or link-checking tool, or ignore it. Never require the user to fix or inspect these links.
 
 ## Redirect integrity
 
-Continue using the [301 Redirects standard](301-redirects.md): existing rules are durable, and removing or renaming established URLs requires user authorization. First discover the host's actual redirect mechanism. A small script can inspect supported rules for duplicate sources, simple chains, loops, and missing local targets. The [redirect-check script](../examples/scripts/check-redirects.mjs) is a **starting point for straightforward `_redirects`-style rules only**. For platforms using other formats or dashboard configuration, install an appropriate validator or explicitly report that registry validation is not available; do not silently install an ineffective `_redirects` file.
+Continue using the [301 Redirects standard](301-redirects.md): existing rules are durable, and removing or renaming established URLs requires user authorization. First discover the host's actual redirect mechanism. A small script can inspect supported rules for duplicate sources, simple chains, loops, and missing local targets. A site-specific checker must support the actual redirect format; a simple `_redirects` parser is insufficient for wildcards, host-level redirects, and provider-specific rules. For platforms using other formats or dashboard configuration, install an appropriate validator or explicitly report that registry validation is not available; do not silently install an ineffective `_redirects` file.
 
 Run checks after builds when practical. Report warnings without failing builds, blocking deployment, or automatically rewriting established redirects. For chains, recommend a direct destination rather than silently changing historical rules.
 
-The agent adapts existing build or CI checks to the project's dependency installation, build command, static output directory, site URL, and supported redirect format; avoid redundant builds. The [GitHub guide](../playbooks/github.md) supplies optional GitHub Actions examples. Checks remain advisory and non-blocking.
+The agent adapts existing build or CI checks to the project's dependency installation, build command, static output directory, site URL, and supported redirect format; avoid redundant builds. The [GitHub playbook](../playbooks/github.md) describes how an agent can create equivalent GitHub Actions. Checks remain advisory and non-blocking.
 
 ## Disappearing URLs
 
