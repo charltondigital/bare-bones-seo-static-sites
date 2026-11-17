@@ -36,6 +36,23 @@ This is a forward-looking setup standard for new sites, regardless of static-sit
 - Only reuse identifiers from the user's supplied link for the **same account/domain**; don't infer that they apply to other accounts or domains.
 - A dashboard link provides navigation context, **not authentication or permission to change settings**. Ask for approval before changes.
 
+## Export, review, and import workflow for AI agents
+
+**Prefer inspecting an existing configuration over guessing.** When Cloudflare supports exporting relevant settings, ask the user to provide the export (for example, DNS records or redirect entries). Review it for current settings, conflicts, duplicates, and dependencies before recommending a change. Never treat a partial export as a complete account audit.
+
+**Prefer ready-to-import files where Cloudflare actually supports import.** For example, prepare a DNS zone-file or redirect CSV only if that feature's current import format and scope are verified. Do not assume all Rules, SSL/TLS options, or Workers settings can be imported.
+
+**Mandatory human review before application:**
+1. Show the proposed additions, removals, and modifications in plain language, including which settings will stay untouched.
+2. Provide the complete draft file for the user's review; flag sensitive records, destructive changes, and any uncertainty.
+3. Ask for explicit approval of the proposed changes **before** importing, uploading, or applying them. Creating a reviewable draft is not authorization to deploy it.
+4. Once approved, provide the import-ready file and a direct dashboard link when possible, or perform the approved operation only if an authorized tool supports it.
+5. After import, request a fresh export or check the live behavior to verify the result; report any discrepancies.
+
+**Never fabricate or overwrite unknown existing settings.** Preserve email records and other unrelated DNS configuration. If the import method replaces an entire list or zone instead of merging records, clearly warn the user and require review of the complete resulting set. If no safe import/export route exists, use minimal manual instructions instead.
+
+**Redirect restriction remains in force:** Agents can prepare proposed redirect entries for review, but must not autonomously apply production 301 changes. Cloudflare is the designated place for production redirects, unless the user explicitly approves an exception.
+
 ## URL and redirect protection policy for AI agents
 
 **Existing public URLs are protected.** Agents must not change, delete, or move an existing page URL (including its slug, path, or permalink structure) without **explicit user approval**. This applies during redesigns, content edits, migrations, and navigation restructuring.
