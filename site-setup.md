@@ -1,32 +1,31 @@
 # Static Site Setup
 
-**Purpose:** Give AI-maintained static sites lightweight, automatic URL-integrity checks from the start, with no manual GitHub Actions setup required of the user.
+**Purpose:** Let an AI agent establish lightweight URL-change reporting and safeguards without making the user configure GitHub Actions manually or slowing ordinary site updates.
 
-## One-time agent setup
+## Agent setup
 
-When setting up a new site, the AI agent should:
+1. Inspect the existing site generator, build, deployment path, and GitHub workflows. Reuse what exists; don't install duplicate checks or dependencies.
+2. Derive a **baseline inventory of publicly served HTML page paths** from a known-good production build or published sitemap corroborated against the build. Normalize trailing slashes, `index.html`, and route conventions. Record the baseline in version control; distinguish pages from images and other assets.
+3. Add a **small deterministic validation script**, integrated with existing CI/build where practical, that compares proposed page URLs and the single redirect registry against the baseline. Have the agent create the workflow/configuration files automatically when needed.
+4. Report meaningful changes in a pull request or workflow summary: added pages, missing/renamed pages, and added/changed/removed redirects. Keep normal, unchanged builds quiet.
+5. Confirm the planned checks are wired into the deployment path when implementing the standard. A test of simulated changes is recommended **when the user is ready**, not a prerequisite for drafting these standards.
+6. Explain clearly whether checks merely report, cause the build to fail, or are **enforced by GitHub/deployment protections**. Don't claim that CI prevents deployment if an agent can push directly or the host deploys despite failed checks.
 
-1. Inspect the existing build and deployment workflow; reuse it rather than adding redundant tooling.
-2. Generate a baseline inventory of published page URLs from the build output (not guessed from source filenames). Normalize URL paths consistently, including trailing-slash conventions.
-3. Set up a fast deterministic check (and GitHub Actions workflow if needed) to compare the proposed build's URL inventory with the previously approved baseline and check the site's redirect registry.
-4. Have the check summarize **new URLs, removed/changed URLs, and redirect additions/modifications/deletions** in the GitHub Actions job summary or pull request when possible.
-5. Test the check with a benign addition and a simulated removal/redirect conflict. Verify it actually runs in the site's deployment workflow.
-6. Explain any GitHub repository permissions or protection settings required to prevent a failed check from being bypassed. Where the agent has appropriate access it can propose and configure those protections; never claim the checks block deployments unless enforcement is verified.
+## Approval and failure rules
 
-The user should not need to create an Actions workflow by hand. For routine changes that preserve published URLs, the check should be quiet and require no extra manual review.
+- **Routine new pages and content edits:** Allow without extra approval; report new URLs only when useful.
+- **Previously public URL removed or renamed:** An AI agent must ask for user approval before changing it and propose the appropriate 301 under [301 Redirects](301-redirects.md). A validator should flag the missing URL; use a failing check where the repository/deployment pipeline supports reliable enforcement.
+- **Existing redirects deleted or rewritten:** Flag for review. Preserve them by default; do not assume they are obsolete because an old page is absent.
+- **New 301:** An agent may propose and implement it as part of an explicitly user-approved URL change. Otherwise, prepare a reviewable change; avoid repeated approvals for details the user has already authorized.
+- **Unclear or incomplete baseline:** Warn rather than automatically blocking the first deployment. Establish the baseline once from known-good output; don't automatically accept every new deployment as the baseline.
+- **Validation failure:** Never silently discard a redirect, rewrite the URL inventory, or bypass a failing check to make CI green. Report the issue and offer a targeted fix. Avoid breaking an otherwise functioning live site just to introduce the safeguards.
 
-## Lightweight URL-integrity behavior
+## Lightweight checks
 
-- **New URL:** Report as informational; no special approval required.
-- **Removed or renamed URL:** Flag and fail the check unless the change was explicitly approved and an appropriate redirect plan exists. The agent must not change published URLs on its own.
-- **Redirect change:** Show the exact old and new mapping. Detect duplicate sources, self-redirects, loops, chains, invalid targets, and unexpected deletion of existing mappings. The separate [301 Redirects](301-redirects.md) standard governs the file format and editing policy.
-- **Destination validation:** Prefer checking against built pages and known redirect maps; do not crawl the entire public site on every build.
-- **Report:** Show only meaningful differences, with concise actionable errors. Avoid a new dashboard, service, database, or recurring notification system.
+Check for duplicate sources, self-redirects, loops, redirect chains, missing destinations, and unexpected removal of historical redirects. Validate against built pages and the redirect registry instead of crawling the whole live site or invoking AI on each build. Run whenever changes could alter output URLs or redirects; avoid redundant full builds and unnecessary notifications.
 
-## Efficiency and safety
+If strong blocking is desired, an authorized agent can configure GitHub rulesets, required status checks, and a protected deployment branch where available. Explain any plan or permission limitations; never assume branch protection exists.
 
-Prefer a small script run as part of the existing build/CI process. Trigger checks when relevant files or the generated URL inventory change where practical, but don't accidentally skip checks on a deployment that can alter URLs. Keep a reliable baseline tied to a previously approved production version; do not automatically replace the baseline with an unreviewed build, which would hide removals.
+**Principle:** Detect and report meaningful URL risks, protect established URLs, and leave routine development alone. No separate dashboard, service, or human-managed CI configuration.
 
-**Important:** An AI-written policy, a passing GitHub Action, and enforced branch/deployment protection are different things. Agent setup is complete only when checks are demonstrated and any remaining enforcement gaps are disclosed.
-
-**Scope:** General site setup and URL change reporting. Cloudflare hosting is covered by [Cloudflare Static Sites](cloudflare-static-sites.md); page-level redirects are covered by [301 Redirects](301-redirects.md).
+**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) for hosting and hostname setup; [301 Redirects](301-redirects.md) for page-level redirects.
