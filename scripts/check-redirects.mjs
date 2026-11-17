@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Advisory check of simple, static HTTP 301/302 redirects in a _redirects registry.
 // Usage: node scripts/check-redirects.mjs [redirect-file] [build-dir]
-// Not a substitute for a live HTTP crawl; does not inspect Cloudflare zone redirects.
+// Not a substitute for a live HTTP crawl; does not inspect host/CDN-level redirects.
 import { existsSync, readFileSync, readdirSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
 const file=process.argv[2]||'public/_redirects', build=process.argv[3]||'dist';
