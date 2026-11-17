@@ -27,20 +27,16 @@ An AI coding agent should first read [Site Setup](standards/site-setup.md), then
 
 **Read the relevant playbooks even for other platforms when useful:** they reveal functional requirements and lessons learned. Then identify equivalent capabilities on the target system, adapt appropriately, and verify. **Never assume another platform supports identical files, commands, dashboard controls, or behavior.** Preserve details from platform experience without elevating them to universal requirements.
 
-### Examples — non-authoritative reference implementations
+## Implementation approach
 
-- [Node.js scripts](examples/scripts/) — outgoing-link inventory, simple `_redirects` diagnostics, and `robots.txt` warnings.
-- [GitHub Actions templates](examples/github-actions/) — sample CI workflows for Node-based static-site builds.
-- [Tests](tests/) — repository checks for these examples and documentation.
-
-Examples are optional. Another AI agent can create equivalent Python scripts, GitLab CI pipelines, framework build hooks, etc. The tests verify the examples, not universal compliance or a completed installation on a target website.
+No bundled scripts or CI templates are required. A coding agent reads the standards, inspects the target site, and writes or adapts whatever build checks are appropriate. The [GitHub playbook](playbooks/github.md) preserves the useful GitHub Actions design and the [Cloudflare playbook](playbooks/cloudflare.md) preserves the deployment knowledge. Both remain optional.
 
 ## Installation checklist for agents
 
 1. Discover the target site's generator, build output, host, source control, and automation.
 2. Follow all applicable **standards**; use platform **playbooks** as references where they reduce guesswork.
 3. Preserve published URLs, metadata overrides, indexation and redirect settings.
-4. Write the simplest site-native implementation that meets the standards. Install only useful examples, if any.
+4. Write the simplest site-native implementation that meets the standards. Avoid imposing external example tooling.
 5. Test the actual built output, verify generated HTML/sitemap/redirect behavior and relevant reports, and disclose any limitations. Do not claim success based on a Markdown file or a configuration file alone.
 
 **Version 0.1 is a standards baseline**, not a published cross-platform installer or proof that every hosting configuration has been validated.
