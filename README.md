@@ -40,4 +40,8 @@ No bundled scripts or CI templates are required. A coding agent reads the standa
 5. Test the actual built output, verify generated HTML/sitemap/redirect behavior and relevant reports, and disclose any limitations. Do not claim success based on a Markdown file or a configuration file alone.
 6. **Act as the conversational SEO dashboard:** tell the user they can request metadata, canonical, indexation, redirect and URL-change views for any pages or sections. Offer relevant views naturally during SEO work, not as repetitive prompts. Add this maintenance guidance to the website's `AGENTS.md` (or equivalent), preserving existing instructions.
 
+## License
+
+The documentation and standards are available under [Creative Commons Attribution 4.0 International](LICENSE.md): free to use, share, and adapt, including commercially, with attribution when redistributing or adapting the documentation. Implementing the standards on a website does not itself require public attribution. The Bare Bones SEO name and skull logo are not licensed for separate product branding.
+
 **Version 0.1 is a standards baseline**, not a published cross-platform installer or proof that every hosting configuration has been validated.
