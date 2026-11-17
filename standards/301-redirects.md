@@ -28,7 +28,7 @@ For other hosts, configure equivalent page-level redirects through their support
 
 ## Validation and change reporting
 
-Use [Static Site Setup](site-setup.md) to detect changed or removed published URLs. Add a lightweight checker suitable for the chosen registry. [`scripts/check-redirects.mjs`](../examples/scripts/check-redirects.mjs) supports **simple static entries in `_redirects` syntax only**; it is not a validator for generic hosting rules, wildcards, conditional redirects, or external hostname behavior.
+Use [Static Site Setup](site-setup.md) to detect changed or removed published URLs. Add a lightweight checker suitable for the chosen registry. A checker for simple `_redirects` entries cannot be assumed to validate wildcards, conditions, other host formats, or hostname-level redirects; report any unsupported coverage.
 
 Warn about duplicate mappings, redirect chains, loops, and likely missing targets where observable. Incomplete coverage must be disclosed rather than portrayed as a clean audit. Validate domain-level or infrastructure redirects with targeted HTTP checks when relevant. Do not automatically rewrite previously approved redirects.
 
