@@ -63,6 +63,10 @@ Distinguish between search-indexing crawlers, AI search/retrieval crawlers, and 
 
 Do not alter crawler permissions without a specific user request. `robots.txt` is not an access-control mechanism, and a `Disallow` rule does not reliably remove an already discovered URL from search results.
 
+## Optional advisory crawler audit
+
+During site setup, the agent may install the reusable [robots.txt audit script](scripts/check-robots.mjs) and [GitHub Actions template](templates/robots-audit.yml), adapting paths to the site's actual build output. The script checks common search and AI-search crawlers and only produces warnings; it does not edit `robots.txt` or fail deployments. Check the generated `robots.txt` rather than assuming a source file is the deployed version. Treat results as heuristics, not proof of Google or LLM crawling behavior.
+
 ## Decision guidance
 
 - **Remove from sitemap:** Set `sitemap: false`; leave `index` unchanged unless requested.
