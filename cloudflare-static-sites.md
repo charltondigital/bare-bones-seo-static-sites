@@ -22,6 +22,26 @@ This is a forward-looking setup standard for new sites, regardless of static-sit
 
 **Principle:** One serving hostname, one WWW redirect rule, no duplicate redirect mechanisms. **Bulk Redirects aren't needed** for this new Workers setup. Preserve unrelated DNS records such as email MX/SPF/DKIM/DMARC.
 
+## Cloudflare-specific redirects and 404 visibility
+
+These implementation details belong **only** to the Cloudflare guide; host-independent decisions and user-approval rules remain in [301 Redirects](301-redirects.md) and [Links and HTTP Errors](links-http-errors.md).
+
+### Page-level redirects on Workers Static Assets
+
+For a Worker configured to serve Static Assets, Cloudflare supports declarative rules in a deployed `_redirects` file. Where this is the authoritative page-redirect mechanism, store the file in source control (often `public/_redirects` for frameworks that copy `public` assets into the output directory) and verify it reaches deployed assets.
+
+```text
+/old-page/ /new-page/ 301
+```
+
+Check [Workers Static Assets redirect syntax and constraints](https://developers.cloudflare.com/workers/static-assets/redirects/) for support, matching order, limits, and interaction with Worker request handlers. If a custom Worker handles requests first, do not assume that `_redirects` applies to that response. Avoid duplicate page redirects in separate Cloudflare dashboard and source-file mechanisms. The optional `check-redirects.mjs` script checks only simple static `_redirects` entries and **does not** evaluate Cloudflare zone redirect rules.
+
+### Live 404s and bot signals
+
+For deployed Cloudflare sites, first inspect available **HTTP traffic / security analytics** or **existing Worker request logs**, subject to the account's plan, retention, sampling, and whether asset requests are represented. Do not presume that detailed URL-level 404 logs or bot scores exist for every site. Bot classification is probabilistic: distinguish likely users, verified search crawlers, and automated probes when evidence permits; never claim certainty.
+
+**Do not add a Worker interceptor, external logging service, database, or request processing solely for 404 tracking by default.** If existing Cloudflare tools only show aggregate status counts, say so. For a user-requested investigation, correlate the available 404 paths against prior published URLs, internal links, and search-engine reports before recommending redirects. See [Links and HTTP Errors](links-http-errors.md) for platform-neutral interpretation.
+
 ## Direct Cloudflare dashboard links for agents
 
 **Prefer direct, clickable dashboard links over menu-by-menu directions.** At the start of an assisted setup, ask the user for **one URL copied from the Cloudflare dashboard for the relevant account and domain**, if no valid dashboard context is available. Never ask for API keys or passwords just to build links.
@@ -47,7 +67,7 @@ This is a forward-looking setup standard for new sites, regardless of static-sit
 - **Safety checks:** Never invent existing settings or overwrite unrelated DNS records. If an import replaces an entire list or zone, explain that clearly and inspect the complete intended result before suggesting it.
 - **Verification:** After changes, use a live test or an export if helpful; don't automatically demand an export when a simpler verification works.
 
-**Scope:** This guide covers domain-level hostname canonicalization (`www` and HTTPS). Page-level redirects are governed separately by [301 Redirects for Static Sites](301-redirects.md) and are managed in the site's GitHub repository.
+**Scope:** This provider guide covers domain-level hostname canonicalization (`www` and HTTPS), Cloudflare's page-level redirect implementation, and Cloudflare-specific 404 visibility. The host-independent redirect policy is in [301 Redirects for Static Sites](301-redirects.md).
 
 ## Official references
 
