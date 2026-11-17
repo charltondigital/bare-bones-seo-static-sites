@@ -4,15 +4,15 @@
 
 ## One-time agent setup
 
-1. Inspect and reuse the site's existing build and GitHub workflow. Avoid additional dependencies and redundant Actions.
+1. Discover the site's **actual hosting platform**, static-site generator, build output, source-control setup, and CI. Inspect and reuse existing build workflows. GitHub Actions are optional and host-independent; avoid additional dependencies and duplicate CI work.
 2. Establish a baseline of previously published HTML page URLs from known-good build output or a sitemap verified against the output. Normalize trailing slashes and `index.html`; do not guess paths from source filenames.
 3. Create `seo/search-exclusions.json` if absent, with `{"defaults":{"index":true,"sitemap":true},"sections":{},"pages":{}}`. First inspect existing sitemap exclusions and `noindex` rules, carrying forward intentional exceptions. Wire **both** page rendering and the existing sitemap generator to consume this single file at build time. Preserve site structure and existing protections; follow [Indexation and Crawling](indexation.md) for scope, precedence, and verification.
 4. Set up the single-owner metadata architecture described in [Metadata and Schema](metadata-schema.md): create sparse `seo/metadata.json` if absent, migrate intentional existing SEO overrides without rewriting them, default title to H1, and ensure one generator per tag. Reuse existing layouts; no required meta descriptions or strategic optimization.
-5. Add a fast, deterministic comparison of the proposed output and existing `_redirects` registry against that baseline. Integrate with existing CI when practical; the agent handles setup, not the user.
-6. Report meaningful differences (new, removed, or changed URLs; added, removed, or modified 301s; duplicate redirects, chains, loops, and missing targets). Keep unchanged builds quiet.
+5. Add a fast, deterministic comparison of proposed output and the site's **actual authoritative redirect configuration** against that baseline. Use `_redirects` only where supported; for other hosts, adapt to native redirect configuration. Integrate with existing CI when practical; the agent handles setup, not the user.
+6. Report observable differences (new, removed, or changed URLs; added, removed, or modified 301s; duplicate redirects, chains, loops, and missing targets). Disclose unsupported redirect rule types or provider-side rules that the local audit cannot inspect. Keep unchanged builds quiet.
 7. **Reporting is advisory by default.** URL warnings must **not fail CI, stop a build, prevent a merge, or block deployment**. Do not add required status checks, branch protections, approval gates, or blocking GitHub rulesets for this system unless the user separately requests them.
-8. Apply [Links and HTTP Errors](links-http-errors.md) where appropriate: reuse the built-page baseline for removed-URL reporting, configure an external-link CSV as a GitHub Action artifact, and check simple redirect chains without a full-site spider. Avoid redundant builds and leave production 404 analytics in Cloudflare unless the user specifically asks for deeper logging.
-9. When actually implementing the checks in a site, verify they run as intended when convenient. Do not claim enforcement exists merely because a workflow was created.
+8. Apply [Links and HTTP Errors](links-http-errors.md) where appropriate: reuse the built-page baseline for removed-URL reporting, generate an external-link CSV as a CI artifact (GitHub Actions when used), and check supported redirect rules without a full-site spider. Avoid redundant builds. Leave production 404 analytics with the chosen host/CDN or existing logs unless the user asks for deeper logging.
+9. After installation, **execute a representative site build and relevant scripts** where feasible. Verify generated HTML, sitemap, metadata, and reports; disclose skipped checks. A document or workflow file alone does not establish working integration.
 
 ## Agent behavior when changes are proposed
 
@@ -25,7 +25,7 @@
 
 ## Efficiency
 
-Use a small script, build output, and the redirect file. No mandatory live-site crawl, AI call per build, separate database, dashboard, recurring notification, or manual GitHub Action setup. The agent should choose the simplest implementation appropriate to the site, and avoid needless reporting for harmless changes.
+Use a small script, build output, and the host-supported redirect configuration. No mandatory live-site crawl, AI call per build, separate database, dashboard, recurring notification, or user-operated CI setup. The agent should choose the simplest implementation appropriate to the site, and avoid needless reporting for harmless changes.
 
 **Principle:** AI should move quickly. Detect and surface risks; never turn this standard into automated deployment bureaucracy.
 
