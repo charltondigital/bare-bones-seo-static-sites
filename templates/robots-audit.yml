@@ -1,0 +1,21 @@
+# Copy to a website repository as .github/workflows/robots-audit.yml.
+# This example checks source public/robots.txt, optionally sampling dist/sitemap.xml.
+# Non-blocking and no modifications to robots.txt.
+name: Robots.txt crawler access (advisory)
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  robots-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Audit robots.txt (warnings only)
+        run: node scripts/check-robots.mjs public/robots.txt
