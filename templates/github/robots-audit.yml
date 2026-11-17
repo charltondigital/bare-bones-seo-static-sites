@@ -1,0 +1,25 @@
+# Example for a Node-based static site; adapt dependencies/build to the generator.
+# Copy to the website repository as .github/workflows/robots-audit.yml.
+# Use the actual built robots.txt/sitemap paths when different.
+name: Robots.txt crawler access (advisory)
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  robots-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Audit generated robots.txt (warnings only)
+        run: node scripts/check-robots.mjs dist/robots.txt dist/sitemap.xml || true
