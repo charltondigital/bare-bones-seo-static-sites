@@ -7,10 +7,11 @@
 1. Inspect and reuse the site's existing build and GitHub workflow. Avoid additional dependencies and redundant Actions.
 2. Establish a baseline of previously published HTML page URLs from known-good build output or a sitemap verified against the output. Normalize trailing slashes and `index.html`; do not guess paths from source filenames.
 3. Create `seo/search-exclusions.json` if absent, with `{"defaults":{"index":true,"sitemap":true},"sections":{},"pages":{}}`. First inspect existing sitemap exclusions and `noindex` rules, carrying forward intentional exceptions. Wire **both** page rendering and the existing sitemap generator to consume this single file at build time. Preserve site structure and existing protections; follow [Indexation and Crawling](indexation.md) for scope, precedence, and verification.
-4. Add a fast, deterministic comparison of the proposed output and existing `_redirects` registry against that baseline. Integrate with existing CI when practical; the agent handles setup, not the user.
-5. Report meaningful differences (new, removed, or changed URLs; added, removed, or modified 301s; duplicate redirects, chains, loops, and missing targets). Keep unchanged builds quiet.
-6. **Reporting is advisory by default.** URL warnings must **not fail CI, stop a build, prevent a merge, or block deployment**. Do not add required status checks, branch protections, approval gates, or blocking GitHub rulesets for this system unless the user separately requests them.
-7. When actually implementing the checks in a site, verify they run as intended when convenient. Do not claim enforcement exists merely because a workflow was created.
+4. Set up the single-owner metadata architecture described in [Metadata and Schema](metadata-schema.md): create sparse `seo/metadata.json` if absent, migrate intentional existing SEO overrides without rewriting them, default title to H1, and ensure one generator per tag. Reuse existing layouts; no required meta descriptions or strategic optimization.
+5. Add a fast, deterministic comparison of the proposed output and existing `_redirects` registry against that baseline. Integrate with existing CI when practical; the agent handles setup, not the user.
+6. Report meaningful differences (new, removed, or changed URLs; added, removed, or modified 301s; duplicate redirects, chains, loops, and missing targets). Keep unchanged builds quiet.
+7. **Reporting is advisory by default.** URL warnings must **not fail CI, stop a build, prevent a merge, or block deployment**. Do not add required status checks, branch protections, approval gates, or blocking GitHub rulesets for this system unless the user separately requests them.
+8. When actually implementing the checks in a site, verify they run as intended when convenient. Do not claim enforcement exists merely because a workflow was created.
 
 ## Agent behavior when changes are proposed
 
@@ -27,4 +28,4 @@ Use a small script, build output, and the redirect file. No live-site crawl, AI 
 
 **Principle:** AI should move quickly. Detect and surface risks; never turn this standard into automated deployment bureaucracy.
 
-**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) covers domains and hosting; [301 Redirects](301-redirects.md) covers page-level redirects; [Indexation and Crawling](indexation.md) covers shared sitemap and `noindex` controls.
+**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) covers domains and hosting; [301 Redirects](301-redirects.md) covers page-level redirects; [Indexation and Search Exclusions](indexation.md) covers shared sitemap and `noindex` controls; [Metadata and Schema](metadata-schema.md) covers single-owner SEO metadata.
