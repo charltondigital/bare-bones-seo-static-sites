@@ -22,6 +22,20 @@ This is a forward-looking setup standard for new sites, regardless of static-sit
 
 **Principle:** One serving hostname, one WWW redirect rule, no duplicate redirect mechanisms. **Bulk Redirects aren't needed** for this new Workers setup. Preserve unrelated DNS records such as email MX/SPF/DKIM/DMARC.
 
+## Direct Cloudflare dashboard links for agents
+
+**Prefer direct, clickable dashboard links over menu-by-menu directions.** At the start of an assisted setup, ask the user for **one URL copied from the Cloudflare dashboard for the relevant account and domain**, if no valid dashboard context is available. Never ask for API keys or passwords just to build links.
+
+- Identify the account segment and domain/zone segment from the supplied URL. **Do not assume an account ID is interchangeable with a zone ID or domain name.**
+- Reuse those segments to construct related zone-level links when the route is known:
+  - DNS Records: `https://dash.cloudflare.com/{account}/{zone}/dns/records`
+  - SSL/TLS Edge Certificates: `https://dash.cloudflare.com/{account}/{zone}/ssl-tls/edge-certificates`
+  - Redirect Rules: `https://dash.cloudflare.com/{account}/{zone}/rules/redirect-rules`
+- Present actionable links at the step where they are needed. When routing to Workers project or account-level settings, use the specific verified route for that account/project; do not guess using zone paths.
+- **Verify routes when practical.** If a dashboard link redirects unexpectedly, fails, or its path is uncertain, give the Cloudflare navigation path instead and ask the user for that page's URL.
+- Only reuse identifiers from the user's supplied link for the **same account/domain**; don't infer that they apply to other accounts or domains.
+- A dashboard link provides navigation context, **not authentication or permission to change settings**. Ask for approval before changes.
+
 ## URL and redirect protection policy for AI agents
 
 **Existing public URLs are protected.** Agents must not change, delete, or move an existing page URL (including its slug, path, or permalink structure) without **explicit user approval**. This applies during redesigns, content edits, migrations, and navigation restructuring.
