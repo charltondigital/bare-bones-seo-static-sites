@@ -1,40 +1,37 @@
 # 301 Redirects for Static Sites
 
-**Purpose:** Maintain permanent page redirects in a single GitHub-managed registry without allowing AI agents to casually break established URLs.
+**Purpose:** Preserve published page URLs and maintain one auditable source for page-level redirects on **any static host**.
 
-**Scope:** Page-level redirects for static sites on Cloudflare Workers Static Assets. Domain-level HTTPS and `www` redirects belong to [Cloudflare Static Sites](cloudflare-static-sites.md).
+## Host-independent policy
 
-## Implementation
+- **Established URLs are protected.** Do not remove, rename, or repurpose public URLs without user approval, including indirect changes in refactors or content generation.
+- **Show consequential URL changes clearly.** For a proposed rename, identify the old URL, new URL, and proposed 301. One approval can cover a batch; do not demand repeated approvals after authorization.
+- **Deletions require a disposition.** For each removed published page, propose a relevant 301 destination or explain why an intentional 404/410 is appropriate. Never redirect all removed pages to the homepage by default.
+- **Keep historical redirects.** Never silently delete or change previously approved mappings, even when their source pages have been gone for years. Ask before changing them.
+- **One authoritative redirect registry.** Prefer a redirect configuration stored in the site's GitHub repository and consumed by its deployment process. Use the deployment host's **actual supported format and features**; do not introduce a second competing registry.
+- **Routine page edits** require no extra approvals when URLs and redirects remain unchanged.
 
-Use **one** tracked `_redirects` file, copied by the site build to the deployed static-assets directory (often `public/_redirects`). For ordinary static assets, Cloudflare Workers supports this declarative format without custom request-handling code.
+## Implementation on the selected host
+
+An AI agent must discover the host, framework, and existing redirect mechanism **before choosing a file format**. Some platforms consume a deployed `_redirects` file; others require a platform configuration file, deployment rules, server configuration, or application routing. A `_redirects` file has **no universal semantics** on static hosts and must not be installed as if it did.
+
+Where the host supports a declarative `_redirects` registry, use it as the single source if appropriate:
 
 ```text
 /old-page/ /new-page/ 301
 /old-services/ /services/ 301
 ```
 
-Check the current platform's supported syntax, limits, matching order, and whether the Worker serves requests through static assets; custom Worker responses may bypass `_redirects`. Do not duplicate page redirects in the Cloudflare dashboard, Astro routing, and multiple redirect files.
+For other hosts, configure equivalent page-level redirects through their supported mechanism, keeping the authoritative source in version-controlled configuration where possible. Verify actual live HTTP redirect status and destination after deployment. If the host requires dashboard-only settings, report that limitation rather than writing an ineffective file.
 
-## Rules for AI agents
-
-- **Existing public URLs are protected.** Never change, remove, or rename an established public URL or permalink path without user approval, including indirect changes during content collection or routing refactors.
-- **Show the change, not bureaucracy.** For a proposed rename, explain the reason and show the exact old URL, new URL, and proposed 301. Obtain approval for the consequential URL change. Once approved, the agent can prepare and apply the corresponding redirect within the approved scope without asking repeatedly.
-- **Page deletion or consolidation triggers a URL disposition discussion.** Before removing any published page, the agent must proactively present its existing URL and recommend either a relevant 301 destination or an intentional 404/410 when no suitable replacement exists. Explain the choices and obtain approval before changing the live URL behavior. For multiple pages, show a single concise table of old URLs and recommendations, and request one combined decision. Never default every deleted URL to the homepage. If the user has already explicitly approved the destination and deletion, do not request duplicate approval.
-- **Existing 301s are durable.** Read the complete registry before editing. Preserve historical redirects; do not remove or change them just because their source pages disappeared. Ask for approval before modifying or removing an existing mapping.
-- **New redirects stay in one place.** Update `_redirects` and avoid redirect chains, loops, duplicates, invalid destinations, or speculative cleanups.
-- **Routine page edits:** No extra approvals when URLs and redirects remain unchanged.
-- **Minimal human work:** Prepare reviewable diffs or pull requests when review is appropriate, rather than requesting the user manually edit redirect files.
+**Domain-level hostname, HTTPS, and `www` redirects are infrastructure settings.** Configure them using the selected host's documented capabilities, separate from page-level URL changes. The optional [Cloudflare Static Sites](cloudflare-static-sites.md) guide provides one provider-specific implementation.
 
 ## Validation and change reporting
 
-Use the lightweight one-time automation in [Static Site Setup](site-setup.md) to **report** URL changes and differences in `_redirects`. These checks are **advisory and non-blocking by default**: they do not fail builds, require pull requests, or stop deployments. Reuse existing GitHub builds; don't require the user to set up a separate action.
+Use [Static Site Setup](site-setup.md) to detect changed or removed published URLs. Add a lightweight checker suitable for the chosen registry. [`scripts/check-redirects.mjs`](scripts/check-redirects.mjs) supports **simple static entries in `_redirects` syntax only**; it is not a validator for generic hosting rules, wildcards, conditional redirects, or external hostname behavior.
 
-## Performance and boundaries
+Warn about duplicate mappings, redirect chains, loops, and likely missing targets where observable. Incomplete coverage must be disclosed rather than portrayed as a clean audit. Validate domain-level or infrastructure redirects with targeted HTTP checks when relevant. Do not automatically rewrite previously approved redirects.
 
-Static-asset `_redirects` rules do not require a custom Worker script on every normal page request. Keep rules simple and observe Cloudflare's documented behavior and limits. Check the deployed response for affected redirects when deploying changes.
+Reports are **advisory and non-blocking** by default. Reuse existing build workflows; do not add mandatory pull requests, protected branch checks, or approval gates unless the user requests them.
 
-**Principle:** Keep old URLs stable, maintain a single auditable redirect file, and only change established URLs with informed user approval.
-
-## Official reference
-
-- [Cloudflare Workers Static Assets redirects](https://developers.cloudflare.com/workers/static-assets/redirects/)
+**Principle:** Protect established URLs, keep redirect ownership unambiguous, and adapt implementation to the host without changing SEO policy.
