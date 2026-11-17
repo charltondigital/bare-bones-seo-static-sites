@@ -1,31 +1,29 @@
 # Static Site Setup
 
-**Purpose:** Let an AI agent establish lightweight URL-change reporting and safeguards without making the user configure GitHub Actions manually or slowing ordinary site updates.
+**Purpose:** Give AI-maintained static sites lightweight, automated **reporting** on URL and redirect changes without slowing routine development or blocking deployments.
 
-## Agent setup
+## One-time agent setup
 
-1. Inspect the existing site generator, build, deployment path, and GitHub workflows. Reuse what exists; don't install duplicate checks or dependencies.
-2. Derive a **baseline inventory of publicly served HTML page paths** from a known-good production build or published sitemap corroborated against the build. Normalize trailing slashes, `index.html`, and route conventions. Record the baseline in version control; distinguish pages from images and other assets.
-3. Add a **small deterministic validation script**, integrated with existing CI/build where practical, that compares proposed page URLs and the single redirect registry against the baseline. Have the agent create the workflow/configuration files automatically when needed.
-4. Report meaningful changes in a pull request or workflow summary: added pages, missing/renamed pages, and added/changed/removed redirects. Keep normal, unchanged builds quiet.
-5. Confirm the planned checks are wired into the deployment path when implementing the standard. A test of simulated changes is recommended **when the user is ready**, not a prerequisite for drafting these standards.
-6. Explain clearly whether checks merely report, cause the build to fail, or are **enforced by GitHub/deployment protections**. Don't claim that CI prevents deployment if an agent can push directly or the host deploys despite failed checks.
+1. Inspect and reuse the site's existing build and GitHub workflow. Avoid additional dependencies and redundant Actions.
+2. Establish a baseline of previously published HTML page URLs from known-good build output or a sitemap verified against the output. Normalize trailing slashes and `index.html`; do not guess paths from source filenames.
+3. Add a fast, deterministic comparison of the proposed output and existing `_redirects` registry against that baseline. Integrate with existing CI when practical; the agent handles setup, not the user.
+4. Report meaningful differences (new, removed, or changed URLs; added, removed, or modified 301s; duplicate redirects, chains, loops, and missing targets). Keep unchanged builds quiet.
+5. **Reporting is advisory by default.** URL warnings must **not fail CI, stop a build, prevent a merge, or block deployment**. Do not add required status checks, branch protections, approval gates, or blocking GitHub rulesets for this system unless the user separately requests them.
+6. When actually implementing the checks in a site, verify they run as intended when convenient. Do not claim enforcement exists merely because a workflow was created.
 
-## Approval and failure rules
+## Agent behavior when changes are proposed
 
-- **Routine new pages and content edits:** Allow without extra approval; report new URLs only when useful.
-- **Previously public URL removed or renamed:** An AI agent must ask for user approval before changing it and propose the appropriate 301 under [301 Redirects](301-redirects.md). A validator should flag the missing URL; use a failing check where the repository/deployment pipeline supports reliable enforcement.
-- **Existing redirects deleted or rewritten:** Flag for review. Preserve them by default; do not assume they are obsolete because an old page is absent.
-- **New 301:** An agent may propose and implement it as part of an explicitly user-approved URL change. Otherwise, prepare a reviewable change; avoid repeated approvals for details the user has already authorized.
-- **Unclear or incomplete baseline:** Warn rather than automatically blocking the first deployment. Establish the baseline once from known-good output; don't automatically accept every new deployment as the baseline.
-- **Validation failure:** Never silently discard a redirect, rewrite the URL inventory, or bypass a failing check to make CI green. Report the issue and offer a targeted fix. Avoid breaking an otherwise functioning live site just to introduce the safeguards.
+- **Routine edits and new pages:** Proceed normally without additional permission or reporting overhead.
+- **Removing, renaming, or consolidating established pages:** Proactively show the old URLs and recommend relevant 301 destinations (or explain when 404/410 is more appropriate). Obtain the user's approval for the URL change; one grouped approval covers a batch. If the user has already authorized the specific change and disposition, do not ask again.
+- **Adding a 301 for an approved URL change:** The agent may implement the associated mapping in GitHub as part of the approved work.
+- **Modifying or deleting an existing 301:** Preserve it unless the user authorizes the change; do not prune historical redirects simply because the source URL no longer has a page.
+- **Unexpected changes detected by CI:** Report concise findings, with suggested next steps. Warnings do not stop deployment; agent instructions to request approval are a separate workflow, not a CI gate.
+- **Baseline uncertain or incomplete:** Report uncertainty and establish a reliable baseline without freezing an existing working site or silently resetting history.
 
-## Lightweight checks
+## Efficiency
 
-Check for duplicate sources, self-redirects, loops, redirect chains, missing destinations, and unexpected removal of historical redirects. Validate against built pages and the redirect registry instead of crawling the whole live site or invoking AI on each build. Run whenever changes could alter output URLs or redirects; avoid redundant full builds and unnecessary notifications.
+Use a small script, build output, and the redirect file. No live-site crawl, AI call per build, separate database, dashboard, recurring notification, or manual GitHub Action setup. The agent should choose the simplest implementation appropriate to the site, and avoid needless reporting for harmless changes.
 
-If strong blocking is desired, an authorized agent can configure GitHub rulesets, required status checks, and a protected deployment branch where available. Explain any plan or permission limitations; never assume branch protection exists.
+**Principle:** AI should move quickly. Detect and surface risks; never turn this standard into automated deployment bureaucracy.
 
-**Principle:** Detect and report meaningful URL risks, protect established URLs, and leave routine development alone. No separate dashboard, service, or human-managed CI configuration.
-
-**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) for hosting and hostname setup; [301 Redirects](301-redirects.md) for page-level redirects.
+**Related:** [Cloudflare Static Sites](cloudflare-static-sites.md) covers domains and hosting; [301 Redirects](301-redirects.md) covers page-level redirects.
