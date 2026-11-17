@@ -65,7 +65,7 @@ Do not alter crawler permissions without a specific user request. `robots.txt` i
 
 ## Optional advisory crawler audit
 
-During site setup, the agent may install the optional [robots.txt audit script](../examples/scripts/check-robots.mjs) into the site's existing build or CI process. The [GitHub guide](../playbooks/github.md) provides a GitHub Actions example. Adapt build steps and paths to the site's actual generator and static output. The script checks common search and AI-search crawlers and only produces warnings; it does not edit `robots.txt` or fail deployments. Check the generated `robots.txt` rather than assuming a source file is the deployed version. Treat results as heuristics, not proof of Google or LLM crawling behavior.
+During site setup, the agent may create a small advisory check using the site's existing build or CI tools. Inspect the generated `robots.txt` and, optionally, the sitemap for accidental blocks of common search and AI-search crawlers. Adapt to the actual output; never change crawler rules automatically or block deployment. The [GitHub playbook](../playbooks/github.md) explains how to run these checks in GitHub Actions. Check the generated `robots.txt` rather than assuming a source file is the deployed version. Treat results as heuristics, not proof of Google or LLM crawling behavior.
 
 ## Decision guidance
 
