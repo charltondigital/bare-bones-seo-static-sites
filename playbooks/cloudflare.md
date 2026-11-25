@@ -1,10 +1,10 @@
 # Cloudflare Static Sites
 
-**Purpose:** Publish a new static site from GitHub using Cloudflare Workers Static Assets, with **one public production address: `https://customdomain.com`**.
+**Purpose:** Publish a static site from GitHub using Cloudflare Workers Static Assets or maintain an existing Cloudflare Pages deployment, with **one public production address: `https://customdomain.com`**.
 
-This is a **Cloudflare-specific implementation playbook** for new sites, regardless of static-site generator. It does not cover legacy Cloudflare Pages migrations or general SEO. The core SEO standards do not require Cloudflare.
+This is a **Cloudflare-specific implementation playbook** regardless of static-site generator. Prefer Workers Static Assets for new sites; the separate Pages procedure below applies to existing Pages deployments without requiring migration. It does not cover general SEO. The core SEO standards do not require Cloudflare.
 
-## Setup
+## Setup — Workers Static Assets
 
 1. **Configure deployment.** In Cloudflare **Workers & Pages**, create a Worker with Static Assets. Configure the site's build command and output directory. For Astro, a typical setup uses `npm run build` and `dist/`; use a Workers static-assets configuration such as Wrangler `assets.directory = "./dist"`. Connect a supported Git-based deployment integration (e.g. GitHub via Workers Builds) or deploy through your existing CI. For GitHub-specific automation, see [GitHub](github.md).
 2. **Assign the production domain.** In the Worker's **Settings → Domains & Routes**, add **Custom Domain** `customdomain.com` only. Confirm Cloudflare has provisioned the required DNS routing and HTTPS certificate.
@@ -21,6 +21,30 @@ This is a **Cloudflare-specific implementation playbook** for new sites, regardl
    - preview/version URLs aren't inadvertently exposing indexable duplicates.
 
 **Principle:** One serving hostname, one WWW redirect rule, no duplicate redirect mechanisms. **Bulk Redirects aren't needed** for this new Workers setup. Preserve unrelated DNS records such as email MX/SPF/DKIM/DMARC.
+
+## Setup — existing Cloudflare Pages projects
+
+Use this procedure for an existing Pages project with a public `project.pages.dev` production hostname. Do not apply the Workers-only `workers_dev = false` setting to Pages or migrate a working project solely to canonicalize its hostname.
+
+1. In **Workers & Pages → your Pages project → Custom domains**, attach the apex production domain `customdomain.com` and confirm DNS and TLS are active.
+2. Add a proxied WWW DNS record (a redirect-only A record to `192.0.2.1` is suitable), configure the zone's **Redirect from WWW to root** rule with status 301 and path/query preservation, and enable **Always Use HTTPS**, as in the Workers procedure above.
+3. At the **account level**, open **Bulk Redirects**. Reuse a shared list named `pages_dev_redirects` if one already exists; otherwise create it. Add one entry per project's production Pages hostname:
+
+   | Setting | Value |
+   | --- | --- |
+   | Source URL | `project.pages.dev/` |
+   | Target URL | `https://customdomain.com/` |
+   | Status code | 301 |
+   | Preserve query string | On |
+   | Subpath matching | On |
+   | Preserve path suffix | On |
+   | Include subdomains | Off for production-only matching |
+
+4. Ensure an enabled account-level Bulk Redirect **rule** actually references the list. Creating the list alone does not activate redirects. Reuse the existing rule rather than adding redundant rules or duplicate entries. Preserve entries for other projects. Do not put this hostname redirect in the site's page-level `_redirects` file.
+5. Review branch/deployment preview hostnames separately. The production-only entry deliberately excludes subdomains such as `preview.project.pages.dev`; it does not protect those URLs. Restrict preview access where appropriate, and verify preview indexing controls independently.
+6. After configuration propagates, test the production Pages hostname at the root and at a real nested page with a query string. Also test the apex, HTTP and WWW variants. Check status codes and Location headers where possible, not just the browser's final address. Confirm the path and query survive and the canonical destination does not loop. If a redirect fails, check that the rule is enabled, references the intended list, and that the entry's matching settings are correct before creating additional rules.
+
+**Working example:** HourlyTechs (`hourlytechs.pages.dev/` → `https://hourlytechs.com/`), with a shared `pages_dev_redirects` list. Production Pages hostname redirection was reported working on November 25, 2026. Nested path/query and preview-host behavior require separate verification.
 
 ## Cloudflare-specific redirects and 404 visibility
 
@@ -67,7 +91,7 @@ For deployed Cloudflare sites, first inspect available **HTTP traffic / security
 - **Safety checks:** Never invent existing settings or overwrite unrelated DNS records. If an import replaces an entire list or zone, explain that clearly and inspect the complete intended result before suggesting it.
 - **Verification:** After changes, use a live test or an export if helpful; don't automatically demand an export when a simpler verification works.
 
-**Scope:** This provider guide covers domain-level hostname canonicalization (`www` and HTTPS), Cloudflare's page-level redirect implementation, and Cloudflare-specific 404 visibility. The host-independent redirect policy is in [301 Redirects for Static Sites](../standards/301-redirects.md).
+**Scope:** This provider guide covers domain-level hostname canonicalization (`www` and HTTPS), Cloudflare's page-level redirect implementation, default Workers and Pages hostname handling, and Cloudflare-specific 404 visibility. The host-independent redirect policy is in [301 Redirects for Static Sites](../standards/301-redirects.md).
 
 
 ## Applying these lessons on other platforms
@@ -79,7 +103,7 @@ This playbook is also a **functional checklist**, not a universal recipe. An AI 
 | One Worker custom domain | One canonical production hostname |
 | Always Use HTTPS | Enforce HTTPS for public pages |
 | Proxied `www` plus a redirect rule | Redirect alternate hostnames to the canonical host, retaining paths and queries |
-| Disable public `workers.dev` | Prevent duplicate indexable deployment or preview hostnames |
+| Disable public `workers.dev` or redirect production `pages.dev` | Prevent duplicate indexable deployment or preview hostnames |
 | Static Assets `_redirects` | Preserve page-level URL redirects using the target host's supported mechanism |
 | Inspect Cloudflare HTTP/security analytics | Use existing host/CDN access logs and available bot signals when investigating 404s |
 
@@ -87,6 +111,8 @@ This playbook is also a **functional checklist**, not a universal recipe. An AI 
 
 ## Official references
 
+- [Cloudflare Pages redirects](https://developers.cloudflare.com/pages/configuration/redirects/)
+- [Bulk Redirects](https://developers.cloudflare.com/rules/url-forwarding/bulk-redirects/)
 - [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/)
 - [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/)
 - [Workers Custom Domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/)
